@@ -18,13 +18,6 @@ typedef struct {
     char * key;
 } crypt;
 
-char *message;
-size_t nameBytes = 11;
-size_t msgBytes = 512;
-
-enum ALPHA {
-    A,B,C,T,L
-};
 
 void error(char *msg)
 {
@@ -151,7 +144,7 @@ char * encrypt(char * msg, char * key){
 
         encMsg[i] = (char)res;
     }
-    encMsg[i]= '\0';
+    encMsg[i]= '\n';
 
     return encMsg;
 }
@@ -227,7 +220,7 @@ int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
 }
 
 
-int process_message(char * fileName, char *keyName, char * result){
+int process_message(char * fileName, char *keyName, char ** result){
     FILE * fpFile;
     FILE * fpKey;
     int gets;
@@ -249,11 +242,10 @@ int process_message(char * fileName, char *keyName, char * result){
         return -1;
     }
 
-    result = malloc(sizeof(msg->msg));
-    result = decrypt(  encrypt(msg->msg, msg->key),msg->key );
+    *result = malloc(sizeof(msg->msg));
+    *result  =  encrypt(msg->msg, msg->key);
 
-//    free(msg->key);
-//    free (msg->msg);
+
     free(msg);
 
     fclose(fpFile);
@@ -286,7 +278,7 @@ int main(int argc, char *argv[])
     }
 
 
-/*    socket = start_server(argv[1]);
+   socket = start_server(argv[1]);
 
     if(socket < 0)
         error("no socket");
@@ -294,41 +286,37 @@ int main(int argc, char *argv[])
     //loop to accept incoming connections;
         clilen = sizeof(cli_addr);
 
-        while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
-            if (accept_socket < 0) {
-                error("SERVER ERROR on Accept");
-            }else{
+    while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
+        if (accept_socket < 0) {
+            error("SERVER ERROR on Accept");
+        }else{
 
-                fprintf(stdout, "client connected...\n");
-            }
-
-            receiver(accept_socket, fileName, 100);
-            receiver(accept_socket, keyName, 100);
-
-           process_message(fileName, keyName, encrypted );
-            fprintf(stdout, "Received: %s - %s\n", fileName, keyName);
-            fprintf(stdout, "ENCRYPTED: %s", encrypted);
-
-
+            fprintf(stdout, "client connected...\n");
         }
 
+        receiver(accept_socket, fileName, 100);
+        receiver(accept_socket, keyName, 100);
 
-    }*/
+        if(( process_message(fileName, keyName, &encrypted )) < 0)
+           error("couldn't process message");
 
-    //fclose(accept_socket);
+        //fprintf(stdout, "Received: %s - %s\n", fileName, keyName);
+        write(accept_socket, (char *)strlen(encrypted), 4);
+        write(accept_socket, encrypted, strlen(encrypted));
 
-
-     if(( process_message("plaintext1", "testKey", encrypted )) < 0)
-            error("couldn't process message");
-
-    fprintf(stdout, "ENCRYPTED: %s", encrypted);
-
-
-    //test2 =  decrypt(encrypt("THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG", key), key);
+    }
 
 
-//
+    close(accept_socket);
 
 
-    //close(socket);
+//     if(( process_message("plaintext1", "testKey", &encrypted )) < 0)
+//            error("couldn't process message");
+
+    fprintf(stdout, "%s\n", encrypted);
+
+    free (encrypted);
+
+
+    close(socket);
 }

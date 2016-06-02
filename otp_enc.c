@@ -88,23 +88,24 @@ int make_connection(char* port){
 
 // returns the result of the read
 int receiver(int sockfd, char  *msg, size_t msgBytes){
-    int m;
+    int m =0;
+    msg = malloc(sizeof(char) *msgBytes);
+    while(m < msgBytes){
+        m = read(sockfd, msg, msgBytes);
 
-    m = read(sockfd, msg, msgBytes);
-
-    if (m < 0){
-        printf("SERVER ERROR receiving from socket");
-        return m;
+        if (m < 0){
+            printf("SERVER ERROR receiving from socket");
+            return m;
+        }
     }
-
     return m;
 
 }
 
 int main(int argc, char *argv[]) {
     int x, sent, rcvd;
-    char buffer[256];
-
+    char * msgBuffer;
+    char * msgSize;
 
     if (argc < 3) {
         fprintf(stderr, "usage <%s> [filename] [key filename] [port number]\n", argv[0]);
@@ -119,7 +120,9 @@ int main(int argc, char *argv[]) {
 
     send(x, argv[1], 100, MSG_DONTWAIT);  //send file name
     send(x, argv[2], 100, MSG_DONTWAIT); // send key file name
-
+    receiver(x, msgSize, 4);
+    receiver(x, msgBuffer, (size_t)msgSize);
+    fprintf(stdout, "%s", msgBuffer);
 
     close(x);
 //    rcvd = receiver(x, buffer, 1000);
