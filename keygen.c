@@ -28,7 +28,7 @@ void error(char *msg)
     perror(msg);
 
 }
-
+//TODO TITLE AND CLEANUP!
 char * gen_key(size_t size){
     int i;
     FILE * fp;
@@ -55,7 +55,8 @@ char * gen_key(size_t size){
     //get the actual size of that key generated in case it was too short
     for(i = 0; i < size; i++){
 
-        key[i] = randomchar[random()%27];
+        //key[i] = randomchar[random()%28];??
+        key[i] = (char)(( random()%(127 - 32)) + 32); //all printable ascii values
     }
 
     return key;
