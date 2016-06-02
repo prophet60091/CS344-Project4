@@ -22,6 +22,9 @@ char *message;
 size_t nameBytes = 11;
 size_t msgBytes = 512;
 
+enum ALPHA {
+    A,B,C,T,L
+};
 
 void error(char *msg)
 {
@@ -142,8 +145,8 @@ char * encrypt(char * msg, char * key){
 
         res = key[i] + msg[i]; // key + our ascii value
 
-        if( res > 177){     //take care of all ascii vals
-            res = res - 177;
+        if( res > 126){     //take care of all ascii vals
+            res = res - 126 + 32;
         }
 
         encMsg[i] = (char)res;
@@ -166,7 +169,7 @@ char * decrypt(char * msg, char * key){
 
 
         if(res < 0){
-            res = res + 177;
+            res = res + 126 - 32;
         }
 
         encMsg[i] = (char)res;
@@ -199,7 +202,7 @@ int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
     size_t cur_fileLength = 1;
     size_t cur_keyLength = 1;
     size_t end = 0;
-    int result;
+    int result =0;
 
     msg->msg= malloc(BUFSIZ);
     msg->key= malloc(BUFSIZ);
@@ -216,7 +219,10 @@ int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
         return result;
     }
 
-    //TODO pop off the newline character
+    //pop off the newline character
+    msg->msg[strlen(msg->msg) -1] = NULL;
+    msg->key[strlen(msg->key) -1] = NULL;
+
     return result;
 }
 
@@ -312,7 +318,7 @@ int main(int argc, char *argv[])
     //fclose(accept_socket);
 
 
-     if(( process_message("plaintext4", "testKey", encrypted )) < 0)
+     if(( process_message("plaintext1", "testKey", encrypted )) < 0)
             error("couldn't process message");
 
     fprintf(stdout, "ENCRYPTED: %s", encrypted);
