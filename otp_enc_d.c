@@ -7,12 +7,13 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <strings.h>
+#include <string.h>
 #include "otp_enc_d.h"
 
 void error(char *msg)
 {
     perror(msg);
-
+    exit(2);
 }
 
 int start_server(char * port){
@@ -135,7 +136,7 @@ char * decrypt(char * msg, char * key){
 
 //Receiving Function
 //@params the socket int, pointer to the message, sizeof the message
-// returns the result of the read
+// returns the result of the read ie. the number of bytes read
 int receiver(int sockfd, char  *msg, size_t msgBytes){
     int m =0;
     while(m < msgBytes){
@@ -251,10 +252,12 @@ int main(int argc, char *argv[])
         if(( process_message(fileName, keyName, &encrypted )) < 0)
            error("couldn't process message");
 
+        sprintf(eLength, "%zu", strlen(encrypted));
 
-
-        //fprintf(stdout, "Received: %s - %s\n", fileName, keyName);
-        write(accept_socket, (char*)strlen(encrypted), 8);
+        fprintf(stdout, "Received: %s - %s\n", fileName, keyName);
+        fprintf(stdout, "Sending Length: %s", eLength);
+        write(accept_socket, eLength, 8);
+        fprintf(stdout, "Sending msg: %s", eLength);
         write(accept_socket, encrypted, strlen(encrypted));
 
     }

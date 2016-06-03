@@ -84,11 +84,11 @@ int make_connection(char* port){
 //@params the socket int, pointer to the message, sizeof the message
 
 // returns the result of the read
-int receiver(int sockfd, char  *msg, size_t msgBytes){
+int receiver(int sockfd, char  **msg, size_t msgBytes){
     int m =0;
-    msg = malloc(sizeof(char) *msgBytes);
+    *msg = realloc(*msg, (sizeof(char) *msgBytes));
     while(m < msgBytes){
-        m = read(sockfd, msg, msgBytes);
+        m = read(sockfd, *msg, msgBytes);
 
         if (m < 0){
             printf("SERVER ERROR receiving from socket");
@@ -101,8 +101,8 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
 
 int main(int argc, char *argv[]) {
     int x;
-    char * msgBuffer;
-    char * msgSize;
+    char * msgBuffer = malloc(sizeof(char) * BUFSIZ);
+    char * msgSize = malloc(sizeof(char) * 8);
 
     if (argc < 3) {
         fprintf(stderr, "usage <%s> [filename] [key filename] [port number]\n", argv[0]);
@@ -115,12 +115,18 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    send(x, argv[1], 100, MSG_DONTWAIT);  //send file name
-    send(x, argv[2], 100, MSG_DONTWAIT); // send key file name
-    receiver(x, msgSize, 8);
-    receiver(x, msgBuffer, (size_t)msgSize);
+    send(x, argv[1], 100, 0);  //send file name
+    send(x, argv[2], 100, 0); // send key file name
+    fprintf(stdout, "getting next msg size");
+    receiver(x, &msgSize, 8);
+    fprintf(stdout, "received msg size of %i", atoi(msgSize));
+    receiver(x, &msgBuffer, (size_t)atoi(msgSize) -1);
+
     fprintf(stdout, "%s", msgBuffer);
 
+
+    free(msgBuffer);
+    free(msgSize);
     close(x);
 //    rcvd = receiver(x, buffer, 1000);
 //    if (rcvd < 0)
