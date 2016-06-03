@@ -13,7 +13,7 @@
 void error(char *msg)
 {
     perror(msg);
-    exit(2);
+
 }
 
 int start_server(char * port){
@@ -53,40 +53,11 @@ int start_server(char * port){
 
     return sockfd;
 
-//    while(1) {
-//
-//        listen(sockfd, 5);
-//
-//        clilen = sizeof(cli_addr);
-//
-//        nsocket = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-//
-//        if (nsocket  < 0)
-//            error("SERVER ERROR on Accept");
-//
-//        message = (char *) malloc(msgBytes);
-//        bzero(message, msgBytes);
-//
-//        while (1) {
-//
-//            m = receiver(nsocket, message, msgBytes);
-//            bzero(message, msgBytes);
-//
-//            // if quit is sent
-//            if (m <= 0) {
-//                close(nsocket);
-//                free(message);
-//                break;
-//            }
-//
-//        }
-//        close(nsocket);
-//        free(message);
-//    }
 
     //return nsocket;
     //adapted a bit from http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
     // adapted from http://www.linuxhowtos.org/data/6/client.c
+    // OSU Lecture
 }
 
 
@@ -164,6 +135,13 @@ int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
          error("failed reading from file");
          return result;
      }
+    if (result < 0){
+        error("failed reading from file");
+        return result;
+    }
+
+    s= 0;
+    result =0;
 
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
@@ -179,11 +157,11 @@ int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
 }
 
 
-int process_message(char * fileName, char *keyName, char ** result){
+int process_message(char * fileName, char *keyName, char **result){
     FILE * fpFile;
     FILE * fpKey;
     int gets;
-    crypt * msg;
+    crypt * msg = malloc(sizeof(crypt));;
 
     fpFile = fopen(fileName, "r");
     fpKey = fopen(keyName, "r");
@@ -193,7 +171,6 @@ int process_message(char * fileName, char *keyName, char ** result){
         return -1;
     }
 
-    msg = malloc(sizeof(crypt));
 
     gets = read_message(fpFile, fpKey, msg);
     if(gets < 0){
@@ -208,7 +185,7 @@ int process_message(char * fileName, char *keyName, char ** result){
     free(msg);
 
     fclose(fpFile);
-    //fclose(fpKey);
+    fclose(fpKey);
 
     return 0;
 }
@@ -216,7 +193,7 @@ int process_message(char * fileName, char *keyName, char ** result){
 
 int main(int argc, char *argv[])
 {
-    int socket, accept_socket, result;
+    int socket, accept_socket, result, n;
     socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr, client_fd;
     char fileName[1024];
@@ -246,18 +223,29 @@ int main(int argc, char *argv[])
             fprintf(stdout, "client connected...\n");
         }
 
-        receiver(accept_socket, fileName, 100);
-        receiver(accept_socket, keyName, 100);
+        n = receiver(accept_socket, fileName, 100);
+        //todo change if statements to handle errors, currently only for debugging
+        if (n > 0){
+            fprintf(stdout, "Received: %s\n", fileName);
+        }
 
-        if(( process_message(fileName, keyName, &encrypted )) < 0)
+        receiver(accept_socket, keyName, 100);
+        if (n > 0){
+            fprintf(stdout, "Received: %s\n", keyName);
+        }
+
+        if(( n= process_message(fileName, keyName, &encrypted )) < 0)
            error("couldn't process message");
 
-        sprintf(eLength, "%zu", strlen(encrypted));
 
-        fprintf(stdout, "Received: %s - %s\n", fileName, keyName);
-        fprintf(stdout, "Sending Length: %s", eLength);
+        sprintf(eLength, "%zu", strlen(encrypted));
+        if (n == 0){
+            fprintf(stdout, "move along...encrypted  %s bytes\n", eLength);
+        }
+
+        //fprintf(stdout, "Sending Length: %s", eLength);
         write(accept_socket, eLength, 8);
-        fprintf(stdout, "Sending msg: %s", eLength);
+        //fprintf(stdout, "Sending msg: %s", eLength);
         write(accept_socket, encrypted, strlen(encrypted));
 
     }
@@ -266,8 +254,9 @@ int main(int argc, char *argv[])
     close(accept_socket);
 
 
-//     if(( process_message("plaintext1", "testKey", &encrypted )) < 0)
+//     if((n= process_message("plaintext4", "testKey", &encrypted )) < 0)
 //            error("couldn't process message");
+
 
     fprintf(stdout, "%s\n", encrypted);
 

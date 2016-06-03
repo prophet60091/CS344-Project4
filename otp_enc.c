@@ -100,7 +100,7 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
 }
 
 int main(int argc, char *argv[]) {
-    int x;
+    int x, n;
     char * msgBuffer = malloc(sizeof(char) * BUFSIZ);
     char * msgSize = malloc(sizeof(char) * 8);
 
@@ -115,9 +115,15 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    send(x, argv[1], 100, 0);  //send file name
-    send(x, argv[2], 100, 0); // send key file name
-    fprintf(stdout, "getting next msg size");
+    n = write(x, argv[1], 100);  //send file name
+    if (n > 0){
+        fprintf(stdout, "sent: %i\n", n);
+    }
+    write(x, argv[2], 100); // send key file name
+    if (n > 0){
+        fprintf(stdout, "sent: %i\n", n);
+    }
+    //fprintf(stdout, "getting next msg size");
     receiver(x, &msgSize, 8);
     fprintf(stdout, "received msg size of %i", atoi(msgSize));
     receiver(x, &msgBuffer, (size_t)atoi(msgSize) -1);
