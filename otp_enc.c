@@ -38,6 +38,7 @@
 void error(char *msg)
 {
     perror(msg);
+    exit(2);
 
 }
 
@@ -120,7 +121,7 @@ int main(int argc, char *argv[]) {
 
     send(x, argv[1], 100, MSG_DONTWAIT);  //send file name
     send(x, argv[2], 100, MSG_DONTWAIT); // send key file name
-    receiver(x, msgSize, 4);
+    receiver(x, msgSize, 8);
     receiver(x, msgBuffer, (size_t)msgSize);
     fprintf(stdout, "%s", msgBuffer);
 

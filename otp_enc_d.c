@@ -5,19 +5,10 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <unistd.h>
-#include <netdb.h>
 #include <sys/errno.h>
 #include <string.h>
-#include <sys/stat.h>
-
-
-typedef struct {
-    char * msg;
-    char * key;
-} crypt;
-
+#include "otp_enc_d.h"
 
 void error(char *msg)
 {
@@ -98,34 +89,6 @@ int start_server(char * port){
     // adapted from http://www.linuxhowtos.org/data/6/client.c
 }
 
-int * gen_key(size_t size){
-    int i;
-    FILE * fp;
-    int * key = malloc(sizeof(int) * size+1);
-    int keySize =0;
-    int seed =0;
-
-    // read from dev urandom because better random seed!
-    if((int)(fp = fopen("/dev/urandom" , "r" )) < 0) { // opening fails
-
-        error("Couldn't open random " );
-        return NULL;
-    }
-
-    fread(&seed, sizeof(int), 1, fp);
-    fclose(fp);
-
-    srand((unsigned)seed);
-
-    //get the actual size of that key generated in case it was too short
-    for(i = 0; i < size; i++){
-            key[i] = rand();
-    }
-
-    return key;
-
-}
-
 
 char * encrypt(char * msg, char * key){
     int i;
@@ -173,7 +136,6 @@ char * decrypt(char * msg, char * key){
 
 //Receiving Function
 //@params the socket int, pointer to the message, sizeof the message
-
 // returns the result of the read
 int receiver(int sockfd, char  *msg, size_t msgBytes){
     int m =0;
@@ -192,9 +154,6 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
 int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
 
     size_t s= 0;
-    size_t cur_fileLength = 1;
-    size_t cur_keyLength = 1;
-    size_t end = 0;
     int result =0;
 
     msg->msg= malloc(BUFSIZ);
@@ -213,8 +172,8 @@ int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
     }
 
     //pop off the newline character
-    msg->msg[strlen(msg->msg) -1] = NULL;
-    msg->key[strlen(msg->key) -1] = NULL;
+    msg->msg[strlen(msg->msg) -1] = '\0';
+    msg->key[strlen(msg->key) -1] = '\0';
 
     return result;
 }
@@ -249,7 +208,7 @@ int process_message(char * fileName, char *keyName, char ** result){
     free(msg);
 
     fclose(fpFile);
-    fclose(fpKey);
+    //fclose(fpKey);
 
     return 0;
 }
@@ -257,20 +216,13 @@ int process_message(char * fileName, char *keyName, char ** result){
 
 int main(int argc, char *argv[])
 {
-    int socket, accept_socket, result, ears;
+    int socket, accept_socket, result;
     socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr, client_fd;
-
-    //int * key = gen_key(256);
-
-    int fileNameSize;
-    char keyNameSize[1];
-    char portSize[1];
-
     char fileName[1024];
     char keyName[1024];
     char * encrypted;
-    char port[10];
+    char * eLength;
 
     if (argc < 1) {
         fprintf(stderr,"usage is <%s>  [port number]\n", argv[0]);
@@ -300,8 +252,10 @@ int main(int argc, char *argv[])
         if(( process_message(fileName, keyName, &encrypted )) < 0)
            error("couldn't process message");
 
+
+
         //fprintf(stdout, "Received: %s - %s\n", fileName, keyName);
-        write(accept_socket, (char *)strlen(encrypted), 4);
+        write(accept_socket, (char*)strlen(encrypted), 8);
         write(accept_socket, encrypted, strlen(encrypted));
 
     }
