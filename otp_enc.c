@@ -46,12 +46,10 @@ void error(char *msg)
 
 int make_connection(char* port){
 
-    int sockfd, n;
+    int sockfd;
 
     struct sockaddr_in serv_addr;
     struct hostent *server;
-
-    int is = 0;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -105,7 +103,7 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
 }
 
 int main(int argc, char *argv[]) {
-    int x, sent, rcvd;
+    int x;
     char * msgBuffer;
     char * msgSize;
 
