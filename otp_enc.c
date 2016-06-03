@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/errno.h>
-#include <string.h>
+#include <strings.h>
 #include "otp_enc.h"
 
 
