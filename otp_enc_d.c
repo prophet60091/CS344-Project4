@@ -3,11 +3,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/errno.h>
-#include <string.h>
+#include <strings.h>
 #include "otp_enc_d.h"
 
 void error(char *msg)

@@ -63,7 +63,7 @@ int make_connection(char* port){
 
     serv_addr.sin_family = AF_INET;
 
-    bcopy(server->h_addr,
+    bcopy(server->h_addr_list[0],
           (char *)&serv_addr.sin_addr.s_addr,
           (size_t)server->h_length);
     serv_addr.sin_port = htons((uint16_t)atoi(port));
