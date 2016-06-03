@@ -6,16 +6,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <unistd.h>
-#include <netdb.h>
 #include <sys/errno.h>
 #include <strings.h>
 #include "otp_enc.h"
 
-struct hostent *server;
+
 //Sending Files
 //@params the socket int, string file contents, sizeof the message
 // send the file
@@ -49,7 +46,7 @@ int make_connection(char* port){
     int sockfd;
 
     struct sockaddr_in serv_addr;
-    //struct hostent *server;
+    struct hostent *server;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
