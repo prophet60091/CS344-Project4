@@ -68,9 +68,9 @@ int make_connection(char* port){
 
     serv_addr.sin_family = AF_INET;
 
-    bcopy((char *)server->h_addr,
+    bcopy(server->h_addr,
           (char *)&serv_addr.sin_addr.s_addr,
-          server->h_length);
+          (size_t)server->h_length);
     serv_addr.sin_port = htons((uint16_t)atoi(port));
 
     if (connect(sockfd,(struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
