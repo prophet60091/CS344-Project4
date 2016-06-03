@@ -4,6 +4,8 @@
 
 #ifndef PROJECT4_OTP_ENC_D_H
 #define PROJECT4_OTP_ENC_D_H
+
+
 typedef struct {
     char * msg;
     char * key;
