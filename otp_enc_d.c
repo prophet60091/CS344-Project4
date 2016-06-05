@@ -225,9 +225,9 @@ int sender(int socket, char *msg){
         if (fullSize - n < chunk){
             chunk = fullSize-n;
         }
-
+        fprintf(stdout, "sending...");
     }while(n < strlen(msg));
-
+        fprintf(stdout, "sent");
     return n;
 
 }
@@ -319,15 +319,13 @@ int main(int argc, char *argv[])
                 }
 
                 //NOW PROCESS MESSAGES AND THE LIKE
-                n = receiver(com_socket, fileName, 100);
-                //todo change if statements to handle errors, currently only for debugging
-                if (n > 0){
-                    //fprintf(stdout, "Received flle named: %s\n", fileName);
+
+                if ((n = receiver(com_socket, fileName, 100)) < 0){
+                    error("didnt receive file name", 1);
                 }
 
-                n= receiver(com_socket, keyName, 100);
-                if (n > 0){
-                    //fprintf(stdout, "Received key: %s\n", keyName);
+                if ((n= receiver(com_socket, keyName, 100)) < 0){
+                    error("didnt receive key file name", 1);
                 }
 
                 if(( n= process_message(fileName, keyName, &encrypted )) < 0)
@@ -335,10 +333,10 @@ int main(int argc, char *argv[])
 
 
                 sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
-
-                if (n != 0){
-                    error( "Something went wrong when getting the length\n", 1);
-                }
+//
+//                if (n != 0){
+//                    error( "Something went wrong when getting the length\n", 1);
+//                }
 
                 if( (n=write(com_socket, eLength, 8)) < 8){
                     fprintf(stdout, "only sent %i bytes", n);
@@ -352,6 +350,7 @@ int main(int argc, char *argv[])
                 close(com_socket);
                 free (encrypted);
 
+                kill(pcessID, SIGKILL);
 
             default:
                 // WERE IN THE PARENT

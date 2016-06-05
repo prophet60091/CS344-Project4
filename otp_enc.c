@@ -106,8 +106,9 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
             chunk = fullSize-m;
         }
 
+        fprintf(stdout, "receiving");
     }while(m < msgBytes);
-
+    fprintf(stdout, "received");
     return m;
 }
 
