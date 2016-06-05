@@ -15,7 +15,7 @@ void error(char *msg);
 int start_server(char * port);
 char *_encrypt(char *msg, char *key);
 char * decrypt(char * msg, char * key);
-int sender(int socket, char *msg)
+int sender(int socket, char *msg);
 int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg);
 int process_message(char * fileName, char *keyName, char ** result);
 
