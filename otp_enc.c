@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
     int x, n;
     char * msgBuffer = calloc(BUFSIZ, sizeof(char));
     char * msgSize = calloc(8, sizeof(char));
+    char * newPort = calloc(8, sizeof(char));
 
     //check that we have enough args
     if (argc < 3) {
@@ -127,6 +128,22 @@ int main(int argc, char *argv[]) {
 
     if (x < 0)
         error("Connection failed on port");
+
+    //get  new port assignment
+    n =0;
+   while (n <= 0){
+        n= receiver(x, &newPort, 8);
+
+        // error if we didnt receive the total.
+        if (n < 8){
+            fprintf(stdout, "Failed getting a new port: %i\n", n);
+        }
+    }
+
+    //hang up dial new connection
+    close(x);
+    x = make_connection(newPort);
+
 
     //Send the name of the file to be encrypted
     n = write(x, argv[1], 100);  //send file name

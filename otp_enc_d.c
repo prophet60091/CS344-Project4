@@ -18,7 +18,7 @@ void error(char *msg)
 
 //starts the server listening and binding to ports
 // @ param the port number
-int start_server(char * port){
+int start_server(int port){
 
     int sockfd, optval, ears;
     struct sockaddr_in serv_addr;
@@ -38,7 +38,7 @@ int start_server(char * port){
     //set serv_addr
     serv_addr.sin_family = AF_INET; //STREAM
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons((uint16_t)atoi(port)); // wat port
+    serv_addr.sin_port = htons((uint16_t)port); // wat port
 
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
@@ -50,7 +50,7 @@ int start_server(char * port){
     if(ears  < 0 ){
         error("I can't hear you! Lalalalalala");
     }else{
-        fprintf(stdout, "Listening on %s\n", port);
+        fprintf(stdout, "Listening on %i\n", port);
     }
 
     return sockfd;
@@ -232,28 +232,29 @@ int sender(int socket, char *msg){
 
 int main(int argc, char *argv[])
 {
-    int socket, accept_socket, n;
+    int socket, newSocket, accept_socket, com_socket, n;
     socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr, client_fd;
     char fileName[1024];
     char keyName[1024];
     char * encrypted;
     char eLength[8] ;
+    char newPortString[8];
+    int  newPort;
+    clilen = sizeof(cli_addr);
 
     if (argc < 1) {
         fprintf(stderr,"usage is <%s>  [port number]\n", argv[0]);
         exit(0);
     }
 
-
-    socket = start_server(argv[1]);
+    //establish the hookup channel
+    socket = start_server(atoi(argv[1]));
 
     if(socket < 0)
         error("no socket");
 
     //loop to accept incoming connections;
-    clilen = sizeof(cli_addr);
-
     while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
         if (accept_socket < 0) {
             error("SERVER ERROR on Accept");
@@ -262,18 +263,48 @@ int main(int argc, char *argv[])
             fprintf(stdout, "client connected...\n");
         }
 
-        //make sure al garbage is out
+        //make sure all garbage is out
         memset(eLength, 0, sizeof(eLength));
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
-        n = receiver(accept_socket, fileName, 100);
+        /// FIRST ESTABLISH A NEW COMMUNICATION PORT
+        srand((unsigned)time(NULL)); // seed random
+        newPort = atoi(argv[1]) + (rand() % 21 + 1); // newport starting point
+
+        //Loop unitl we get a good port
+        int i = 1;
+        while ((newSocket = start_server(newPort)) < 0){
+
+            newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
+            i++;
+        };
+
+        sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
+        //send that to the client
+        if( (n=write(accept_socket, newPortString, 8)) < 8){
+            fprintf(stdout, "only sent %i bytes", n);
+            error("Sending Port: Didn't send enough bytes");
+        }
+
+        close(accept_socket);
+
+        com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
+            if (accept_socket < 0) {
+                error("SERVER ERROR on Accept");
+            }else{
+
+                fprintf(stdout, "client connected...\n");
+            }
+
+        //NOW PROCESS MESSAGES AND THE LIKE
+        n = receiver(com_socket, fileName, 100);
         //todo change if statements to handle errors, currently only for debugging
         if (n > 0){
             //fprintf(stdout, "Received flle named: %s\n", fileName);
         }
 
-        n= receiver(accept_socket, keyName, 100);
+        n= receiver(com_socket, keyName, 100);
         if (n > 0){
             //fprintf(stdout, "Received key: %s\n", keyName);
         }
@@ -282,25 +313,26 @@ int main(int argc, char *argv[])
            error("couldn't process message");
 
 
-        sprintf(eLength, "%zu", strlen(encrypted));
+        sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
+
         if (n != 0){
             error( "Something went wrong when getting the length\n");
         }
 
-        fprintf(stdout, "Sending Length: %s", eLength);
-
-        if( (n=write(accept_socket, eLength, 8)) < 8){
+        if( (n=write(com_socket, eLength, 8)) < 8){
             fprintf(stdout, "only sent %i bytes", n);
             error("Writing Size: Didn't send enough bytes");
         }
 
-        if ((n = sender(accept_socket, encrypted)) < 0){
+        if ((n = sender(com_socket, encrypted)) < 0){
             error("Failed Sending");
         }
 
+        close(com_socket);
+
     }
 
-    close(accept_socket);
+   // close(accept_socket);
 
     //output the encryted
     fprintf(stdout, "%s", encrypted);

@@ -12,7 +12,7 @@ typedef struct {
 } crypt;
 int receiver(int sockfd, char  *msg, size_t msgBytes);
 void error(char *msg);
-int start_server(char * port);
+int start_server(int port);
 char *_encrypt(char *msg, char *key);
 char * decrypt(char * msg, char * key);
 int sender(int socket, char *msg);
