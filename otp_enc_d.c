@@ -321,15 +321,15 @@ int main(int argc, char *argv[])
                 //NOW PROCESS MESSAGES AND THE LIKE
 
                 if ((n = receiver(com_socket, fileName, 100)) < 0){
-                    error("didnt receive file name", 1);
+                    error("didnt receive file name", 2);
                 }
 
                 if ((n= receiver(com_socket, keyName, 100)) < 0){
-                    error("didnt receive key file name", 1);
+                    error("didnt receive key file name", 2);
                 }
 
                 if(( n= process_message(fileName, keyName, &encrypted )) < 0)
-                    error("couldn't process message", 1);
+                    error("couldn't process message", 2);
 
 
                 sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
