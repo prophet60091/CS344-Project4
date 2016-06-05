@@ -16,6 +16,8 @@ void error(char *msg)
 
 }
 
+//starts the server listening and binding to ports
+// @ param the port number
 int start_server(char * port){
 
     int sockfd, optval, ears;
@@ -43,7 +45,7 @@ int start_server(char * port){
              sizeof(serv_addr)) < 0)
         error("SERVER ERROR on binding");
 
-
+    //strat listening
     ears = listen(sockfd, 5);
     if(ears  < 0 ){
         error("I can't hear you! Lalalalalala");
@@ -53,26 +55,28 @@ int start_server(char * port){
 
     return sockfd;
 
-
-    //return nsocket;
     //adapted a bit from http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
     // adapted from http://www.linuxhowtos.org/data/6/client.c
     // OSU Lecture
 }
 
-
+// Encrypts the message based on the key provided
+// @ param the message to be encrpted
+// @ param the key (same format as above assumed to be at least length of msg)
 char * encrypt(char * msg, char * key){
     int i;
     int msgLength = strlen(msg);
     int res;
-    char * encMsg = malloc(sizeof(char *)* msgLength+1);
+    char * encMsg = calloc((size_t)msgLength, sizeof(char));
+
+    if(strlen(key) < msgLength)
+        error("Invalid Key: too small");
 
     for(i =0; i < msgLength; i++){
 
+        res = key[i] + msg[i]; // key ascii val + our ascii value
 
-        res = key[i] + msg[i]; // key + our ascii value
-
-        if( res > 126){     //take care of all ascii vals
+        if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
             res = res - 126 + 32;
         }
 
@@ -88,7 +92,7 @@ char * decrypt(char * msg, char * key){
     int i;
     int msgLength = strlen(msg);
     int res;
-    char * encMsg = malloc(sizeof(char *)* msgLength+1);
+    char * encMsg = malloc(sizeof(char)* msgLength+1);
 
     for(i =0; i < msgLength; i++){
 
@@ -101,7 +105,7 @@ char * decrypt(char * msg, char * key){
 
         encMsg[i] = (char)res;
     }
-    encMsg[i] = '\0';
+    encMsg[i] = '\n';
     return encMsg;
 }
 
@@ -121,36 +125,33 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
     return m;
 
 }
+//Reads the message into memory
 
 int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg ){
 
     size_t s= 0;
-    int result =0;
+    int result= NULL;
 
-    msg->msg= malloc(BUFSIZ);
-    msg->key= malloc(BUFSIZ);
+    msg->msg= calloc(BUFSIZ, sizeof(char));
+    msg->key= calloc(BUFSIZ, sizeof(char));
 
     result = getline(&msg->msg, &s, fpFILE );
      if (result < 0){
          error("failed reading from file");
-         return result;
-     }
-    if (result < 0){
-        error("failed reading from file");
-        return result;
-    }
+         exit(227); // why 227? Why not!
 
-    s= 0;
-    result =0;
+     }
+
+    s= 0; //VIP!!! reset s to 0 for the reading the key
 
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
         error("failed reading from file");
-        return result;
+        exit(227);
     }
 
     //pop off the newline character
-    msg->msg[strlen(msg->msg) -1] = '\0';
+    msg->msg[strlen(msg->msg) -1] = '\0'; // add a trailing 0 byte for file creation
     msg->key[strlen(msg->key) -1] = '\0';
 
     return result;
@@ -174,13 +175,12 @@ int process_message(char * fileName, char *keyName, char **result){
 
     gets = read_message(fpFile, fpKey, msg);
     if(gets < 0){
-        error("Couldnt read message");
+        error("Couldn't read message");
         return -1;
     }
 
-    *result = malloc(sizeof(msg->msg));
+    *result = calloc(strlen(msg->msg), sizeof(char));
     *result  =  encrypt(msg->msg, msg->key);
-
 
     free(msg);
 
@@ -191,15 +191,38 @@ int process_message(char * fileName, char *keyName, char **result){
 }
 
 
+int sender(int socket, char * encrypted){
+    int n=0;
+    int fullSize =(int)strlen(encrypted);
+    int chunk = BUFSIZ;
+
+    // no chunking required!
+    if (fullSize < chunk){
+        chunk = fullSize;
+    }
+
+    do{
+        n+= write(socket, encrypted+n, (size_t)chunk);
+
+        if (fullSize - n < chunk){
+            chunk = fullSize-n;
+        }
+
+    }while(n < strlen(encrypted));
+
+}
+
+
 int main(int argc, char *argv[])
 {
-    int socket, accept_socket, result, n;
+    int socket, accept_socket, n;
     socklen_t clilen;
     struct sockaddr_in serv_addr, cli_addr, client_fd;
     char fileName[1024];
     char keyName[1024];
     char * encrypted;
-    char * eLength;
+    char eLength[8] ;
+
 
     if (argc < 1) {
         fprintf(stderr,"usage is <%s>  [port number]\n", argv[0]);
@@ -223,15 +246,20 @@ int main(int argc, char *argv[])
             fprintf(stdout, "client connected...\n");
         }
 
+        //make sure al garbage is out
+        memset(eLength, 0, sizeof(eLength));
+        memset(fileName, 0, sizeof(fileName));
+        memset(keyName, 0, sizeof(keyName));
+
         n = receiver(accept_socket, fileName, 100);
         //todo change if statements to handle errors, currently only for debugging
         if (n > 0){
-            fprintf(stdout, "Received: %s\n", fileName);
+            //fprintf(stdout, "Received flle named: %s\n", fileName);
         }
 
-        receiver(accept_socket, keyName, 100);
+        n= receiver(accept_socket, keyName, 100);
         if (n > 0){
-            fprintf(stdout, "Received: %s\n", keyName);
+            //fprintf(stdout, "Received key: %s\n", keyName);
         }
 
         if(( n= process_message(fileName, keyName, &encrypted )) < 0)
@@ -240,13 +268,34 @@ int main(int argc, char *argv[])
 
         sprintf(eLength, "%zu", strlen(encrypted));
         if (n == 0){
-            fprintf(stdout, "move along...encrypted  %s bytes\n", eLength);
+            //fprintf(stdout, "move along...encrypted  %s bytes\n", eLength);
         }
 
-        //fprintf(stdout, "Sending Length: %s", eLength);
-        write(accept_socket, eLength, 8);
-        //fprintf(stdout, "Sending msg: %s", eLength);
-        write(accept_socket, encrypted, strlen(encrypted));
+        fprintf(stdout, "Sending Length: %s", eLength);
+
+        if( (n=write(accept_socket, eLength, 8)) < 8){
+            fprintf(stdout, "only sent %i bytes", n);
+            error("Writing Size: Didn't send enough bytes");
+        }
+        fprintf(stdout, "Sending msg: %s", eLength);
+
+        n=0;
+        int fullSize =(int)strlen(encrypted);
+        int chunk = BUFSIZ;
+
+        // no chunking required!
+        if (fullSize < chunk){
+            chunk = fullSize;
+        }
+
+        do{
+            n+= write(accept_socket, encrypted+n, (size_t)chunk);
+
+            if (fullSize - n < chunk){
+                chunk = fullSize-n;
+            }
+
+        }while(n < strlen(encrypted));
 
     }
 
@@ -254,11 +303,11 @@ int main(int argc, char *argv[])
     close(accept_socket);
 
 
-//     if((n= process_message("plaintext4", "testKey", &encrypted )) < 0)
+//     if((n= process_message("plaintext1", "testKey", &encrypted )) < 0)
 //            error("couldn't process message");
 
 
-    fprintf(stdout, "%s\n", encrypted);
+ //   fprintf(stdout, "%s", encrypted);
 
     free (encrypted);
 
