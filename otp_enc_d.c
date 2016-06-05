@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 
                 com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
 
-                if (accept_socket < 0) {
+                if (com_socket < 0) {
                     error("SERVER ERROR on Accept", 4);
                 }else{
 
