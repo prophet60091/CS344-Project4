@@ -8,17 +8,22 @@
 #include <sys/errno.h>
 #include <strings.h>
 #include <string.h>
+#include <sys/wait.h>
 #include "otp_enc_d.h"
 
-void error(char *msg)
+void error(char *msg, int severity)
 {
     perror(msg);
+
+    if (severity > 1){
+        exit(severity);
+    }
 
 }
 
 //starts the server listening and binding to ports
 // @ param the port number
-int start_server(int port){
+int start_server(int port, int cc){
 
     int sockfd, optval, ears;
     struct sockaddr_in serv_addr;
@@ -26,7 +31,7 @@ int start_server(int port){
     //establish socket type
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
-        error("ERROR opening socket");
+        error("ERROR opening socket", 2);
 
 //    // set SO_REUSEADDR on a socket to true (1):
 //    optval = 1;
@@ -43,12 +48,12 @@ int start_server(int port){
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0)
-        error("SERVER ERROR on binding");
+        error("SERVER ERROR on binding", 2);
 
     //strat listening
-    ears = listen(sockfd, 5);
+    ears = listen(sockfd, cc);
     if(ears  < 0 ){
-        error("I can't hear you! Lalalalalala");
+        error("I can't hear you! Lalalalalala", 2);
     }else{
         fprintf(stdout, "Listening on %i\n", port);
     }
@@ -70,7 +75,7 @@ char *_encrypt(char *msg, char *key){
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
     if(strlen(key) < msgLength)
-        error("Invalid Key: too small");
+        error("Invalid Key: too small", 1);
 
     for(i =0; i < msgLength; i++){
 
@@ -144,9 +149,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     //gather the goods
     result = getline(&msg->msg, &s, fpFILE );
      if (result < 0){
-         error("failed reading from file");
-         exit(227); // why 227? Why not!
-
+         error("failed reading from file", 227);
      }
 
     s= 0; //VIP!!! reset s to 0 for the reading the key
@@ -154,7 +157,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     //get the key
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
-        error("failed reading from file");
+        error("failed reading from file", 227);
         exit(227);
     }
 
@@ -179,14 +182,14 @@ int process_message(char * fileName, char *keyName, char **result){
     fpKey = fopen(keyName, "r");
 
     if(fpFile  < 0 || fpKey < 0){
-        error("file not found");
+        error("file not found", 227);
         return -1;
     }
 
     // gather the message into memory
     gets = _read_message(fpFile, fpKey, msg);
     if(gets < 0){
-        error("Couldn't read message");
+        error("Couldn't read message", 666);
         return -1;
     }
 
@@ -241,6 +244,9 @@ int main(int argc, char *argv[])
     char eLength[8] ;
     char newPortString[8];
     int  newPort;
+    pid_t pcessID= -5;
+    pid_t wpid= -5;
+    int status;
     clilen = sizeof(cli_addr);
 
     if (argc < 1) {
@@ -249,15 +255,15 @@ int main(int argc, char *argv[])
     }
 
     //establish the hookup channel
-    socket = start_server(atoi(argv[1]));
+    socket = start_server(atoi(argv[1]), 5);
 
     if(socket < 0)
-        error("no socket");
+        error("no socket", 3);
 
     //loop to accept incoming connections;
     while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
         if (accept_socket < 0) {
-            error("SERVER ERROR on Accept");
+            error("SERVER ERROR on Accept", 3);
         }else{
 
             fprintf(stdout, "client connected...\n");
@@ -274,7 +280,7 @@ int main(int argc, char *argv[])
 
         //Loop unitl we get a good port
         int i = 1;
-        while ((newSocket = start_server(newPort)) < 0){
+        while ((newSocket = start_server(newPort, 1)) < 0){
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
@@ -284,60 +290,85 @@ int main(int argc, char *argv[])
         //send that to the client
         if( (n=write(accept_socket, newPortString, 8)) < 8){
             fprintf(stdout, "only sent %i bytes", n);
-            error("Sending Port: Didn't send enough bytes");
+            error("Sending Port: Didn't send enough bytes", 1);
         }
 
         close(accept_socket);
 
-        com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
-            if (accept_socket < 0) {
-                error("SERVER ERROR on Accept");
-            }else{
+        pcessID = fork();
+        printf("spawning processes..%i", pcessID);
+        //partially adapted from lecture 9 cs344
+        switch((int)pcessID){
 
-                fprintf(stdout, "client connected...\n");
-            }
+            case -1:
+                //it's in a bad state
 
-        //NOW PROCESS MESSAGES AND THE LIKE
-        n = receiver(com_socket, fileName, 100);
-        //todo change if statements to handle errors, currently only for debugging
-        if (n > 0){
-            //fprintf(stdout, "Received flle named: %s\n", fileName);
+                error("boom!", 5050505);
+                exit(1);
+
+
+            case 0:// WE'RE IN THE CHILD PROCESS
+
+                com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
+
+                if (accept_socket < 0) {
+                    error("SERVER ERROR on Accept", 4);
+                }else{
+
+                    fprintf(stdout, "client connected...\n");
+                }
+
+                //NOW PROCESS MESSAGES AND THE LIKE
+                n = receiver(com_socket, fileName, 100);
+                //todo change if statements to handle errors, currently only for debugging
+                if (n > 0){
+                    //fprintf(stdout, "Received flle named: %s\n", fileName);
+                }
+
+                n= receiver(com_socket, keyName, 100);
+                if (n > 0){
+                    //fprintf(stdout, "Received key: %s\n", keyName);
+                }
+
+                if(( n= process_message(fileName, keyName, &encrypted )) < 0)
+                    error("couldn't process message", 1);
+
+
+                sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
+
+                if (n != 0){
+                    error( "Something went wrong when getting the length\n", 1);
+                }
+
+                if( (n=write(com_socket, eLength, 8)) < 8){
+                    fprintf(stdout, "only sent %i bytes", n);
+                    error("Writing Size: Didn't send enough bytes", 1);
+                }
+
+                if ((n = sender(com_socket, encrypted)) < 0){
+                    error("Failed Sending", 1);
+                }
+
+                close(com_socket);
+                free (encrypted);
+
+
+            default:
+                // WERE IN THE PARENT
+                //ADAPTED FROM **http://brennan.io/2015/01/16/write-a-shell-in-c/**//
+                //Too elegant to pass up. it works really well
+                //  were storing the result of waitpid using WUNTRACED, (reports its status whether stopped or not)
+                // as long as the process didn't exit, or receive a signal, so it's waiting util that happens
+                // when it does, we know that the child process is complete.
+                    do {
+                        wpid = waitpid(pcessID, &status, WUNTRACED);
+
+                    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+
         }
 
-        n= receiver(com_socket, keyName, 100);
-        if (n > 0){
-            //fprintf(stdout, "Received key: %s\n", keyName);
-        }
-
-        if(( n= process_message(fileName, keyName, &encrypted )) < 0)
-           error("couldn't process message");
-
-
-        sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
-
-        if (n != 0){
-            error( "Something went wrong when getting the length\n");
-        }
-
-        if( (n=write(com_socket, eLength, 8)) < 8){
-            fprintf(stdout, "only sent %i bytes", n);
-            error("Writing Size: Didn't send enough bytes");
-        }
-
-        if ((n = sender(com_socket, encrypted)) < 0){
-            error("Failed Sending");
-        }
-
-        close(com_socket);
 
     }
 
-   // close(accept_socket);
-
-    //output the encryted
-    fprintf(stdout, "%s", encrypted);
-
-    //shudderdown
-    free (encrypted);
     close(socket);
 }

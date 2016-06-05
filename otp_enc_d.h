@@ -11,8 +11,8 @@ typedef struct {
     char * key;
 } crypt;
 int receiver(int sockfd, char  *msg, size_t msgBytes);
-void error(char *msg);
-int start_server(int port);
+void error(char *msg, int severity);
+int start_server(int port, int cc);
 char *_encrypt(char *msg, char *key);
 char * decrypt(char * msg, char * key);
 int sender(int socket, char *msg);
