@@ -10,13 +10,13 @@ typedef struct {
     char * msg;
     char * key;
 } crypt;
-
+int receiver(int sockfd, char  *msg, size_t msgBytes);
 void error(char *msg);
 int start_server(char * port);
-char * encrypt(char * msg, char * key);
+char *_encrypt(char *msg, char *key);
 char * decrypt(char * msg, char * key);
-int receiver(int sockfd, char  *msg, size_t msgBytes);
-int read_message(FILE * fpFILE, FILE * fpKEY, crypt * msg );
+int sender(int socket, char *msg)
+int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg);
 int process_message(char * fileName, char *keyName, char ** result);
 
 
