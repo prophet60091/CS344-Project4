@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
-            fprintf(stdout, "found a new port for ye...\n");
+            //fprintf(stdout, "found a new port for ye...\n");
         };
 
         sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
