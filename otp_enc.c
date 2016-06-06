@@ -131,15 +131,12 @@ int main(int argc, char *argv[]) {
 
     //get  new port assignment
 
-    n =0;
-    while (n <= 0){
-        n= receiver(x, &newPort, 8);
-
-        // error if we didnt receive the total.
-        if (n < 8){
-            fprintf(stdout, "Failed getting a new port: %i\n", n);
-        }
+     n= receiver(x, &newPort, 8);
+    // error if we didnt receive the total.
+    if (n < 8){
+        fprintf(stdout, "Failed getting a new port: %i\n", n);
     }
+
 
     //hang up dial new connection
     close(x);

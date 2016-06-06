@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 
         //FORK!!
         pcessID = fork();
-        printf("spawning processes..%i", pcessID);
+        //printf("spawning processes..%i", pcessID);
         //partially adapted from lecture 9 cs344
         switch((int)pcessID){
 
