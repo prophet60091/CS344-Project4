@@ -52,7 +52,7 @@ ${echo} "#-----------------------------------------"
 ${echo} '#otp_enc plaintext1 key70000 $encport'
 ${echo} "#20 POINTS: Should return encrypted version of plaintext1"
 otp_enc plaintext1 key70000 $encport > p1OUT
-sleep 10
+sleep 5
 otp_enc plaintext2 key70000 $encport > p2OUT
 
 #Clean up
