@@ -21,13 +21,47 @@ rm -f plaintext*_*
 rm -f key20
 rm -f key70000
 
+#Record the ports passed in
+encport=$1
+decport=$2
+
 #Run the daemons
 otp_enc_d $encport &
 otp_dec_d $decport &
 
+sleep 5
+
+${echo}
+${echo} '#-----------------------------------------'
+${echo} '#START OF GRADING SCRIPT'
+${echo} '#keygen 20 > key20'
+keygen 20 > key20
+${echo} "#5 POINTS: key20 must exist"
+[ -s key20 ] || rm -f key20
+if [ -f key20 ]; then ${echo} 'key20 exists!'; else ${echo} 'key20 DOES NOT EXIST'; fi
+${echo}
+${echo} "#-----------------------------------------"
+${echo} "#5 POINTS: Number of characters in key20, should be 21:"
+wc -m key20
+${echo}
+${echo} "#-----------------------------------------"
+${echo} '#keygen 70000 > key70000'
 keygen 70000 > key70000
+${echo}
+${echo} "#-----------------------------------------"
+${echo} '#otp_enc plaintext1 key70000 $encport'
+${echo} "#20 POINTS: Should return encrypted version of plaintext1"
+otp_enc plaintext1 key70000 $encport
 
-otp_enc plaintext1 key70000 $encport > p1out
-otp_enc plaintext2 key70000 $encport > p2out
-otp_enc plaintext3 key70000 $encport > p3out
 
+#Clean up
+${echo}
+${echo} '#---------------CLEAN--------------------------'
+${echo} '#Cleaning up - ignore Operation Not Permitted errors'
+killall -q -u $USER otp_*
+rm -f ciphertext*
+rm -f plaintext*_*
+rm -f key20
+rm -f key70000
+${echo}
+${echo} '#SCRIPT COMPLETE'
