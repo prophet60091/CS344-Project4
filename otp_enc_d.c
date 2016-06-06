@@ -1,16 +1,16 @@
 #include <stdio.h>
-#include <sys/types.h>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>
+
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/errno.h>
+
 #include <strings.h>
 #include <string.h>
 #include <sys/wait.h>
 #include "otp_enc_d.h"
-#include <fcntl.h>
+
 void error(char *msg, int severity)
 {
     perror(msg);
@@ -95,7 +95,7 @@ char *_encrypt(char *msg, char *key){
 // @ param the key (same format as above assumed to be at least length of msg)
 char * decrypt(char * msg, char * key){
     int i;
-    int msgLength = strlen(msg);
+    int msgLength = (int)strlen(msg);
     int res;
     char * encMsg = malloc(sizeof(char)* msgLength+1);
 
@@ -249,8 +249,8 @@ int main(int argc, char *argv[])
     char eLength[8] ;
     char newPortString[8];
     int  newPort;
-    pid_t pcessID= -5;
-    pid_t wpid= -5;
+    pid_t pcessID = -5;
+    pid_t wpid = -5;
     int status;
     clilen = sizeof(cli_addr);
 
@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
             fprintf(stdout, "only sent %i bytes", n);
             error("Sending Port: Didn't send enough bytes", 1);
         }else{
-            fprintf(stdout, "told the clint to find me on port %i", newPort);
+            //fprintf(stdout, "told the clint to find me on port %i", newPort);
         }
 
         if( close(accept_socket) < 0)
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 
         //FORK!!
         pcessID = fork();
-        printf("spawning processes..%i", pcessID);
+        //printf("spawning processes..%i\n", pcessID);
         //partially adapted from lecture 9 cs344
         switch((int)pcessID){
 
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
                     error("SERVER ERROR on Accept", 3);
                 }else{
 
-                    fprintf(stdout, "client connected on this shiny new socket!...\n");
+                    //fprintf(stdout, "client connected on this shiny new socket!...\n");
                 }
 
                 //immediately close the listening socket we don't want anyone else on it!

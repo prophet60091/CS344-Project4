@@ -44,7 +44,7 @@ int start_server(int port, int cc){
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0) {
-        error("SERVER ERROR on binding", 1);
+        //error("SERVER ERROR on binding", 1);
         return -1;
     }
 
@@ -68,7 +68,7 @@ int start_server(int port, int cc){
 // @ param the key (same format as above assumed to be at least length of msg)
 char *_encrypt(char *msg, char *key){
     int i;
-    int msgLength = strlen(msg);
+    int msgLength = (int)strlen(msg);
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
-            fprintf(stdout, "found a new port for ye...\n");
+            //fprintf(stdout, "found a new port for ye...\n");
         };
 
         sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
             fprintf(stdout, "only sent %i bytes", n);
             error("Sending Port: Didn't send enough bytes", 1);
         }else{
-            fprintf(stdout, "told the clint to find me on port %i", newPort);
+            //fprintf(stdout, "told the clint to find me on port %i", newPort);
         }
 
         if( close(accept_socket) < 0)
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
                     error("SERVER ERROR on Accept", 3);
                 }else{
 
-                    fprintf(stdout, "client connected on this shiny new socket!...\n");
+                   // fprintf(stdout, "client connected on this shiny new socket!...\n");
                 }
 
                 //immediately close the listening socket we don't want anyone else on it!
