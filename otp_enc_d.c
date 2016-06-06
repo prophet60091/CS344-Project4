@@ -25,7 +25,7 @@ void error(char *msg, int severity)
 // @ param the port number
 int start_server(int port, int cc){
 
-    int sockfd, optval, ears;
+    int sockfd, ears;
     struct sockaddr_in serv_addr;
 
     //establish socket type
@@ -140,7 +140,7 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
 int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
 
     size_t s= 0;
-    int result= NULL;
+    int result= 0;
 
     //clean bits for your enjoyment
     msg->msg= calloc(BUFSIZ, sizeof(char));
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 {
     int socket, newSocket, accept_socket, com_socket, n;
     socklen_t clilen;
-    struct sockaddr_in serv_addr, cli_addr, client_fd;
+    struct sockaddr_in  cli_addr;
     char fileName[1024];
     char keyName[1024];
     char * encrypted;

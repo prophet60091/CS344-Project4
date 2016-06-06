@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 {
     int socket, newSocket, accept_socket, com_socket, n;
     socklen_t clilen;
-    struct sockaddr_in serv_addr, cli_addr, client_fd;
+    struct sockaddr_in cli_addr;
     char fileName[1024];
     char keyName[1024];
     char * encrypted;
