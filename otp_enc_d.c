@@ -248,7 +248,7 @@ void check_identity(int socket, char * incomingIdent){
     if(strcmp(pgrmIDENT, incomingIdent) != 0){
         error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program");
-        exit(1);
+        _exit(0);
     }
 
 }
