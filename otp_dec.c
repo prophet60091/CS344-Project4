@@ -12,6 +12,7 @@
 #include <strings.h>
 #include "otp_dec.h"
 
+char pgrmIDENT[1] = {4};
 
 void error(char *msg)
 {
@@ -107,6 +108,13 @@ int main(int argc, char *argv[]) {
 
     if (x < 0)
         error("Connection failed on port");
+
+    //announce who you are, program
+    n = write(x, (char *)pgrmIDENT, 1);  //send pgrm IDENT
+    if (n < 0){
+        error("Sending file name failed:");
+    }
+
 
     //get  new port assignment
     n =0;

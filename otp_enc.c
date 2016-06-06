@@ -10,8 +10,8 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <strings.h>
-
 #include "otp_enc.h"
+char pgrmIDENT[1] = {5};
 
 
 //Sending Files
@@ -128,6 +128,13 @@ int main(int argc, char *argv[]) {
 
     if (x < 0)
         error("Connection failed on port");
+
+    //announce who you are, program
+    n = write(x, pgrmIDENT, 1);  //send pgrm IDENT
+    if (n < 0){
+        error("Sending file name failed:");
+    }
+
 
     //get  new port assignment
     n =0;

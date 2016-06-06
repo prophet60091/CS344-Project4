@@ -10,6 +10,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include "otp_enc_d.h"
+char pgrmIDENT[1] = {5};
 
 void error(char *msg, int severity)
 {
@@ -238,6 +239,19 @@ int sender(int socket, char *msg){
 
 }
 
+void check_identity(int socket, char * incomingIdent){
+    int n=0;
+    /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
+    if ((n = receiver(socket, incomingIdent, 1)) < 0){
+        error("didnt receive IDENT", 2);
+    }
+
+    if(strcmp(pgrmIDENT, incomingIdent) != 0){
+        error("unknown program trying to access this program", 1);
+        fprintf(stdout, "unknown program trying to access this program");
+    }
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -249,6 +263,7 @@ int main(int argc, char *argv[])
     char * encrypted;
     char eLength[8] ;
     char newPortString[8];
+    char incomingIdent[1] = {0};
     int  newPort;
     pid_t pcessID = -5;
     pid_t wpid = -5;
@@ -277,14 +292,15 @@ int main(int argc, char *argv[])
         }
 
         //add this to the
-
         //make sure all garbage is out
         memset(eLength, 0, sizeof(eLength));
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
+        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
+        check_identity(accept_socket, incomingIdent);
 
-        /// FIRST ESTABLISH A NEW COMMUNICATION PORT
+        /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
         newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
 
