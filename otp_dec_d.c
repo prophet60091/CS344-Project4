@@ -16,7 +16,7 @@ void error(char *msg, int severity)
     perror(msg);
 
     if (severity > 1){
-        exit(severity);
+        exit(2);
     }
 
 }
@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
                 close(com_socket);
                 free (encrypted);
 
-                kill(pcessID, SIGTERM); // make sure the process is terminated
+                kill(pcessID, SIGKILL); // make sure the process is terminated
 
             default:
                 // WERE IN THE PARENT
