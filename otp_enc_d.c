@@ -9,7 +9,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include "otp_enc_d.h"
-char pgrmIDENT[1] = {5};
+char * pgrmIDENT = "enc";
 
 void error(char *msg, int severity)
 {
@@ -241,7 +241,7 @@ int sender(int socket, char *msg){
 void check_identity(int socket, char * incomingIdent){
     int n=0;
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-    if ((n = receiver(socket, incomingIdent, 1)) < 0){
+    if ((n = receiver(socket, incomingIdent, 3)) < 0){
         error("didnt receive IDENT", 2);
     }
 
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
     char * encrypted;
     char eLength[8] ;
     char newPortString[8];
-    char incomingIdent[1] = {0};
+    char incomingIdent[3];
     int  newPort;
     pid_t pcessID = -5;
     pid_t wpid = -5;

@@ -11,8 +11,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include "otp_dec_d.h"
-
-char pgrmIDENT[1] = {4};
+char * pgrmIDENT = "dec";
 
 void error(char *msg, int severity)
 {
@@ -243,7 +242,7 @@ int sender(int socket, char *msg){
 void check_identity(int socket, char * incomingIdent){
     int n=0;
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-    if ((n = receiver(socket, incomingIdent, 1)) < 0){
+    if ((n = receiver(socket, incomingIdent, 3)) < 0){
         error("didnt receive IDENT", 2);
     }
 
@@ -266,7 +265,7 @@ int main(int argc, char *argv[])
     char eLength[8] ;
     char newPortString[8];
     int  newPort;
-    char incIDENT[1] = {0};
+    char incIDENT[3];
     pid_t pcessID= -5;
     pid_t wpid= -5;
     int status;
