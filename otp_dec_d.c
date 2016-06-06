@@ -9,7 +9,7 @@
 #include <strings.h>
 #include <string.h>
 #include <sys/wait.h>
-#include "otp_enc_d.h"
+#include "otp_dec_d.h"
 
 void error(char *msg, int severity)
 {
@@ -65,37 +65,10 @@ int start_server(int port, int cc){
     // OSU Lecture
 }
 
-// Encrypts the message based on the key provided
-// @ param the message to be encrpted
-// @ param the key (same format as above assumed to be at least length of msg)
-char *_encrypt(char *msg, char *key){
-    int i;
-    int msgLength = strlen(msg);
-    int res;
-    char * encMsg = calloc((size_t)msgLength, sizeof(char));
-
-    if(strlen(key) < msgLength)
-        error("Invalid Key: too small", 1);
-
-    for(i =0; i < msgLength; i++){
-
-        res = key[i] + msg[i]; // key ascii val + our ascii value
-
-        if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
-            res = res - 126 + 32;
-        }
-
-        encMsg[i] = (char)res;
-    }
-    encMsg[i]= '\n';
-
-    return encMsg;
-}
-
 // Decrypts the message based on the key provided
 // @ param the message to be decrypted
 // @ param the key (same format as above assumed to be at least length of msg)
-char * decrypt(char * msg, char * key){
+char * _decrypt(char * msg, char * key){
     int i;
     int msgLength = strlen(msg);
     int res;
@@ -196,7 +169,7 @@ int process_message(char * fileName, char *keyName, char **result){
 
     //get some clean bits and store the encrypted text
     *result = calloc(strlen(msg->msg), sizeof(char));
-    *result  = _encrypt(msg->msg, msg->key);
+    *result  = _decrypt(msg->msg, msg->key);
 
     free(msg);
 

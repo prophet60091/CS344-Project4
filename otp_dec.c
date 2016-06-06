@@ -10,29 +10,8 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <strings.h>
+#include "otp_dec.h"
 
-#include "otp_enc.h"
-
-
-//Sending Files
-//@params the socket int, string file contents, sizeof the message
-// send the file
-//void sendfile( int sockfd, string file, unsigned long size){
-//    int m, s;
-//    unsigned long offset = 0;
-//
-//    std::cout << "TOTAL sending " << file.size() << std::endl;
-//
-//    //SEND THE WHOLE FILE
-//    while (offset < file.size()) {
-//
-//        m = send(sockfd, file.c_str()+offset, file.size()-offset,0);
-//        std::cout << "sending " << m << std::endl;
-//        if (m <= 0) break;
-//        offset += m;
-//    }// ADAPTED FROM http://stackoverflow.com/questions/15176213/read-the-whole-file-and-send-it-via-sockets
-//
-//}
 
 void error(char *msg)
 {
@@ -62,7 +41,7 @@ int make_connection(char* port){
 
     bzero((char *) &serv_addr, sizeof(serv_addr)); // clear the garbage
 
-    serv_addr.sin_family = AF_INET; //ip
+    serv_addr.sin_family = AF_INET; //TCP
 
     //assign the struct the proper values
     bcopy(server->h_addr_list[0],
