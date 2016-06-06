@@ -75,6 +75,10 @@ char *_encrypt(char *msg, char *key){
     if(strlen(key) < msgLength)
         error("Invalid Key: too small", 1);
 
+    if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
+        error("Invalid Text, I will encrypt it but...only this once, and no guarantees!", 1);
+    }
+
     for(i =0; i < msgLength; i++){
 
         res = key[i] + msg[i]; // key ascii val + our ascii value
@@ -248,7 +252,6 @@ void check_identity(int socket, char * incomingIdent){
     if(strcmp(pgrmIDENT, incomingIdent) != 0){
         error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program");
-        _exit(0);
     }
 
 }
