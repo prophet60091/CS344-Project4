@@ -165,8 +165,10 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     msg->msg[strlen(msg->msg) -1] = '\0'; // add a trailing 0 byte for file creation
     msg->key[strlen(msg->key) -1] = '\0';
 
-    if(strlen(msg->key) < strlen(msg->msg) )
+    if(strlen(msg->key) < strlen(msg->msg) ){
         error("Key is too short for message!", 1);
+
+    }
 
     return result;
 }
@@ -195,6 +197,8 @@ int process_message(char * fileName, char *keyName, char **result){
         error("Couldn't read message", 666);
         return -1;
     }
+
+
 
 
     //get some clean bits and store the encrypted text
@@ -283,7 +287,7 @@ int main(int argc, char *argv[])
 
         //Loop unitl we get a good port
         int i = 1;
-        while ((newSocket = start_server(newPort, 1)) < 0){
+        while ((newSocket = start_server(newPort, 5)) < 0){
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;

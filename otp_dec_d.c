@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 
         //Loop unitl we get a good port
         int i = 1;
-        while ((newSocket = start_server(newPort, 1)) < 0){
+        while ((newSocket = start_server(newPort, 5)) < 0){
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
