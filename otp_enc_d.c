@@ -239,7 +239,7 @@ int sender(int socket, char *msg){
 }
 
 void check_identity(int sockfd){
-    int n;
+
     char msg[1];
     receiver(sockfd, msg, 1);
 
