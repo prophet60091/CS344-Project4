@@ -165,6 +165,9 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     msg->msg[strlen(msg->msg) -1] = '\0'; // add a trailing 0 byte for file creation
     msg->key[strlen(msg->key) -1] = '\0';
 
+    if(strlen(msg->key) < strlen(msg->msg) )
+        error("Key is too small!", 9);
+
     return result;
 }
 

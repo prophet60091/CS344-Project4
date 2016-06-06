@@ -114,7 +114,7 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
 int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
 
     size_t s= 0;
-    int result= NULL;
+    int result= 0;
 
     //clean bits for your enjoyment
     msg->msg= calloc(BUFSIZ, sizeof(char));
@@ -138,6 +138,9 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     //pop off the newline character
     msg->msg[strlen(msg->msg) -1] = '\0'; // add a trailing 0 byte for file creation
     msg->key[strlen(msg->key) -1] = '\0';
+
+    if(strlen(msg->key) < strlen(msg->msg) )
+        error("Key is too small!", 9);
 
     return result;
 }
