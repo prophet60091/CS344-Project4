@@ -10,7 +10,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include "otp_enc_d.h"
-
+#include <fcntl.h>
 void error(char *msg, int severity)
 {
     perror(msg);
@@ -25,7 +25,7 @@ void error(char *msg, int severity)
 // @ param the port number
 int start_server(int port, int cc){
 
-    int sockfd, ears;
+    int sockfd, optval, ears;
     struct sockaddr_in serv_addr;
 
     //establish socket type
@@ -33,9 +33,11 @@ int start_server(int port, int cc){
     if (sockfd < 0)
         error("ERROR opening socket", 2);
 
-//    // set SO_REUSEADDR on a socket to true (1):
-//    optval = 1;
-//    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+    // set SO_REUSEADDR on a socket to true (1):
+    optval = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+
+    fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
     // clear out the bytes
     bzero((char *) &serv_addr, sizeof(serv_addr));
