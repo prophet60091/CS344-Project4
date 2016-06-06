@@ -135,7 +135,7 @@ int receiver(int sockfd, char  *msg, size_t msgBytes){
 //@params file pointer to the File to be encrypted
 //@params file pointer to the Key file
 //@params point to the strict where the msg and key pair will be stored
-int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
+int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
 
     size_t s= 0;
     int result= 0;
@@ -180,7 +180,7 @@ int process_message(char * fileName, char *keyName, char **result){
     FILE * fpFile;
     FILE * fpKey;
     int gets;
-    crypt * msg = malloc(sizeof(crypt));;
+    cryptog * msg = malloc(sizeof(cryptog));;
 
     fpFile = fopen(fileName, "r");
     fpKey = fopen(keyName, "r");

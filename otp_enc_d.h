@@ -9,14 +9,14 @@
 typedef struct {
     char * msg;
     char * key;
-} crypt;
+} cryptog;
 int receiver(int sockfd, char  *msg, size_t msgBytes);
 void error(char *msg, int severity);
 int start_server(int port, int cc);
 char *_encrypt(char *msg, char *key);
 char * decrypt(char * msg, char * key);
 int sender(int socket, char *msg);
-int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg);
+int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg);
 int process_message(char * fileName, char *keyName, char ** result);
 
 
