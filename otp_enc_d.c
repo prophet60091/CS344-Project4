@@ -232,9 +232,9 @@ int sender(int socket, char *msg){
         if (fullSize - n < chunk){
             chunk = fullSize-n;
         }
-        fprintf(stdout, "sending...");
+
     }while(n < strlen(msg));
-        fprintf(stdout, "sent");
+
     return n;
 
 }
