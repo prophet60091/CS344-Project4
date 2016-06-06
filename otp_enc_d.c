@@ -48,12 +48,12 @@ int start_server(int port, int cc){
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0)
-        error("SERVER ERROR on binding", 2);
+        error("SERVER ERROR on binding", 1);
 
     //strat listening
     ears = listen(sockfd, cc);
     if(ears  < 0 ){
-        error("I can't hear you! Lalalalalala", 2);
+        error("I can't hear you! Lalalalalala", 1);
     }else{
         fprintf(stdout, "Listening on %i\n", port);
     }
