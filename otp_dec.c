@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         // error if we didnt receive the total.
         if (n < 8){
             fprintf(stdout, "Failed getting a new port: %i\n", n);
-   //     }
+        }
    // }
 
     //hang up dial new connection
