@@ -17,6 +17,6 @@ char * _decrypt(char * msg, char * key);
 int sender(int socket, char *msg);
 int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg);
 int process_message(char * fileName, char *keyName, char ** result);
-void check_identity(int sockfd);
+
 
 #endif //PROJECT4_OTP_ENC_D_H

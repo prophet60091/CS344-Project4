@@ -129,20 +129,17 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-//    //announce who you are, program.
-//    n = write(x, "5", 1);  //send file name
-//    if (n < 0){
-//        error("announcing failed:");
-//    }
-
-
     //get  new port assignment
-     n= receiver(x, &newPort, 8);
-    // error if we didnt receive the total.
-    if (n < 8){
-        fprintf(stdout, "Failed getting a new port: %i\n", n);
-    }
 
+    n =0;
+    while (n <= 0){
+        n= receiver(x, &newPort, 8);
+
+        // error if we didnt receive the total.
+        if (n < 8){
+            fprintf(stdout, "Failed getting a new port: %i\n", n);
+        }
+    }
 
     //hang up dial new connection
     close(x);
