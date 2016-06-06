@@ -237,6 +237,18 @@ int sender(int socket, char *msg){
 
 }
 
+void check_identity(int sockfd){
+    int n;
+    char msg[1];
+    receiver(sockfd, msg, 1);
+
+    if(msg[0] != '4'){
+        error("decrypt is trying to call me", 1);
+        fprintf(stdout, "I'm afraid I cannot do that hal."); //errors not going to stdout so...
+        close(sockfd);
+    }
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -282,6 +294,7 @@ int main(int argc, char *argv[])
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
+        check_identity(accept_socket);
 
         /// FIRST ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
