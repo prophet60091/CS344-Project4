@@ -33,12 +33,6 @@ int start_server(int port, int cc){
     if (sockfd < 0)
         error("ERROR opening socket", 2);
 
-//    // set SO_REUSEADDR on a socket to true (1):
-//    optval = 1;
-//    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
-//
-//    fcntl(sockfd, F_SETFL, O_NONBLOCK);
-
     // clear out the bytes
     bzero((char *) &serv_addr, sizeof(serv_addr));
 
@@ -49,10 +43,12 @@ int start_server(int port, int cc){
 
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-             sizeof(serv_addr)) < 0)
+             sizeof(serv_addr)) < 0) {
         error("SERVER ERROR on binding", 1);
+        return -1;
+    }
 
-    //strat listening
+    //start listening
     ears = listen(sockfd, cc);
     if(ears  < 0 ){
         error("I can't hear you! Lalalalalala", 1);
@@ -271,6 +267,7 @@ int main(int argc, char *argv[])
 
     //loop to accept incoming connections;
     while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
+
         if (accept_socket < 0) {
             error("SERVER ERROR on Accept", 3);
         }else{
@@ -278,14 +275,17 @@ int main(int argc, char *argv[])
             fprintf(stdout, "client connected...\n");
         }
 
+        //add this to the
+
         //make sure all garbage is out
         memset(eLength, 0, sizeof(eLength));
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
+
         /// FIRST ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
-        newPort = atoi(argv[1]) + (rand() % 21 + 1); // newport starting point
+        newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
 
         //Loop unitl we get a good port
         int i = 1;
@@ -293,6 +293,7 @@ int main(int argc, char *argv[])
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
+            fprintf(stdout, "found a new port for ye...\n");
         };
 
         sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
@@ -300,9 +301,12 @@ int main(int argc, char *argv[])
         if( (n=write(accept_socket, newPortString, 8)) < 8){
             fprintf(stdout, "only sent %i bytes", n);
             error("Sending Port: Didn't send enough bytes", 1);
+        }else{
+            fprintf(stdout, "told the clint to find me on port %i", newPort);
         }
 
-        close(accept_socket);
+        if( close(accept_socket) < 0)
+            error("closing accept socket", 1);
 
         //FORK!!
         pcessID = fork();
@@ -322,11 +326,15 @@ int main(int argc, char *argv[])
                 com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
 
                 if (com_socket < 0) {
-                    error("SERVER ERROR on Accept", 4);
+                    error("SERVER ERROR on Accept", 3);
                 }else{
 
-                    fprintf(stdout, "client connected...\n");
+                    fprintf(stdout, "client connected on this shiny new socket!...\n");
                 }
+
+                //immediately close the listening socket we don't want anyone else on it!
+                if( close(newSocket) < 0)
+                    error("closing newSocket", 1);
 
                 //NOW PROCESS MESSAGES LIKE
                 if ((n = receiver(com_socket, fileName, 100)) < 0){
@@ -351,8 +359,9 @@ int main(int argc, char *argv[])
                     error("Failed Sending", 1);
                 }
 
-                close(com_socket);
-                close(newSocket);
+                if( close(com_socket) < 0)
+                    error("closing com socket", 1);
+
                 free (encrypted);
 
                 exit(0); // make sure the process is terminated
@@ -368,10 +377,15 @@ int main(int argc, char *argv[])
                         wpid = waitpid(pcessID, &status, WUNTRACED);
 
                     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+
+
         }
 
 
     }
 
-    close(socket);
+    if( close(socket) < 0)
+        error("closing main socket", 1);
+
+    exit (0);
 }

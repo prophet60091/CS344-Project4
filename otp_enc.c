@@ -130,8 +130,9 @@ int main(int argc, char *argv[]) {
         error("Connection failed on port");
 
     //get  new port assignment
+
     n =0;
-   while (n <= 0){
+    while (n <= 0){
         n= receiver(x, &newPort, 8);
 
         // error if we didnt receive the total.

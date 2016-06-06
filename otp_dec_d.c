@@ -11,7 +11,6 @@
 #include <sys/wait.h>
 #include "otp_dec_d.h"
 
-
 void error(char *msg, int severity)
 {
     perror(msg);
@@ -26,17 +25,13 @@ void error(char *msg, int severity)
 // @ param the port number
 int start_server(int port, int cc){
 
-    int sockfd, optval, ears;
+    int sockfd, ears;
     struct sockaddr_in serv_addr;
 
     //establish socket type
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
-        error("ERROR opening socket", 1);
-
-//    // set SO_REUSEADDR on a socket to true (1):
-//    optval = 1;
-//    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+        error("ERROR opening socket", 2);
 
     // clear out the bytes
     bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -48,10 +43,12 @@ int start_server(int port, int cc){
 
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-             sizeof(serv_addr)) < 0)
+             sizeof(serv_addr)) < 0) {
         error("SERVER ERROR on binding", 1);
+        return -1;
+    }
 
-    //strat listening
+    //start listening
     ears = listen(sockfd, cc);
     if(ears  < 0 ){
         error("I can't hear you! Lalalalalala", 1);
@@ -66,10 +63,37 @@ int start_server(int port, int cc){
     // OSU Lecture
 }
 
+// Encrypts the message based on the key provided
+// @ param the message to be encrpted
+// @ param the key (same format as above assumed to be at least length of msg)
+char *_encrypt(char *msg, char *key){
+    int i;
+    int msgLength = strlen(msg);
+    int res;
+    char * encMsg = calloc((size_t)msgLength, sizeof(char));
+
+    if(strlen(key) < msgLength)
+        error("Invalid Key: too small", 1);
+
+    for(i =0; i < msgLength; i++){
+
+        res = key[i] + msg[i]; // key ascii val + our ascii value
+
+        if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
+            res = res - 126 + 32;
+        }
+
+        encMsg[i] = (char)res;
+    }
+    encMsg[i]= '\n';
+
+    return encMsg;
+}
+
 // Decrypts the message based on the key provided
 // @ param the message to be decrypted
 // @ param the key (same format as above assumed to be at least length of msg)
-char * _decrypt(char * msg, char * key){
+char * decrypt(char * msg, char * key){
     int i;
     int msgLength = strlen(msg);
     int res;
@@ -122,9 +146,9 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
 
     //gather the goods
     result = getline(&msg->msg, &s, fpFILE );
-     if (result < 0){
-         error("failed reading from file", 227);
-     }
+    if (result < 0){
+        error("failed reading from file", 227);
+    }
 
     s= 0; //VIP!!! reset s to 0 for the reading the key
 
@@ -139,8 +163,10 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     msg->msg[strlen(msg->msg) -1] = '\0'; // add a trailing 0 byte for file creation
     msg->key[strlen(msg->key) -1] = '\0';
 
-    if(strlen(msg->key) < strlen(msg->msg) )
+    if(strlen(msg->key) < strlen(msg->msg) ){
         error("Key is too short for message!", 1);
+
+    }
 
     return result;
 }
@@ -169,6 +195,8 @@ int process_message(char * fileName, char *keyName, char **result){
         error("Couldn't read message", 666);
         return -1;
     }
+
+
 
 
     //get some clean bits and store the encrypted text
@@ -202,9 +230,9 @@ int sender(int socket, char *msg){
         if (fullSize - n < chunk){
             chunk = fullSize-n;
         }
-        fprintf(stdout, "sending...");
+
     }while(n < strlen(msg));
-        fprintf(stdout, "sent");
+
     return n;
 
 }
@@ -214,7 +242,7 @@ int main(int argc, char *argv[])
 {
     int socket, newSocket, accept_socket, com_socket, n;
     socklen_t clilen;
-    struct sockaddr_in cli_addr;
+    struct sockaddr_in  cli_addr;
     char fileName[1024];
     char keyName[1024];
     char * encrypted;
@@ -232,13 +260,14 @@ int main(int argc, char *argv[])
     }
 
     //establish the hookup channel
-    socket = start_server(atoi(argv[1]), 5);
+    socket = start_server(atoi(argv[1]), 6);
 
     if(socket < 0)
         error("no socket", 3);
 
     //loop to accept incoming connections;
     while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
+
         if (accept_socket < 0) {
             error("SERVER ERROR on Accept", 3);
         }else{
@@ -246,21 +275,25 @@ int main(int argc, char *argv[])
             fprintf(stdout, "client connected...\n");
         }
 
+        //add this to the
+
         //make sure all garbage is out
         memset(eLength, 0, sizeof(eLength));
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
+
         /// FIRST ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
-        newPort = atoi(argv[1]) + (rand() % 21 + 1); // newport starting point
+        newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
 
         //Loop unitl we get a good port
         int i = 1;
-        while ((newSocket = start_server(newPort, 5)) < 0){
+        while ((newSocket = start_server(newPort, 1)) < 0){
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
+            fprintf(stdout, "found a new port for ye...\n");
         };
 
         sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
@@ -268,9 +301,12 @@ int main(int argc, char *argv[])
         if( (n=write(accept_socket, newPortString, 8)) < 8){
             fprintf(stdout, "only sent %i bytes", n);
             error("Sending Port: Didn't send enough bytes", 1);
+        }else{
+            fprintf(stdout, "told the clint to find me on port %i", newPort);
         }
 
-        close(accept_socket);
+        if( close(accept_socket) < 0)
+            error("closing accept socket", 1);
 
         //FORK!!
         pcessID = fork();
@@ -290,11 +326,15 @@ int main(int argc, char *argv[])
                 com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
 
                 if (com_socket < 0) {
-                    error("SERVER ERROR on Accept", 4);
+                    error("SERVER ERROR on Accept", 3);
                 }else{
 
-                    fprintf(stdout, "client connected...\n");
+                    fprintf(stdout, "client connected on this shiny new socket!...\n");
                 }
+
+                //immediately close the listening socket we don't want anyone else on it!
+                if( close(newSocket) < 0)
+                    error("closing newSocket", 1);
 
                 //NOW PROCESS MESSAGES LIKE
                 if ((n = receiver(com_socket, fileName, 100)) < 0){
@@ -319,7 +359,9 @@ int main(int argc, char *argv[])
                     error("Failed Sending", 1);
                 }
 
-                close(com_socket);
+                if( close(com_socket) < 0)
+                    error("closing com socket", 1);
+
                 free (encrypted);
 
                 exit(0); // make sure the process is terminated
@@ -331,14 +373,19 @@ int main(int argc, char *argv[])
                 //  were storing the result of waitpid using WUNTRACED, (reports its status whether stopped or not)
                 // as long as the process didn't exit, or receive a signal, so it's waiting util that happens
                 // when it does, we know that the child process is complete.
-                    do {
-                        wpid = waitpid(pcessID, &status, WUNTRACED);
+                do {
+                    wpid = waitpid(pcessID, &status, WUNTRACED);
 
-                    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+                } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+
+
         }
 
 
     }
 
-    close(socket);
+    if( close(socket) < 0)
+        error("closing main socket", 1);
+
+    exit (0);
 }
