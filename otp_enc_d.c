@@ -2,10 +2,9 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+#include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <strings.h>
 #include <string.h>
 #include <sys/wait.h>
