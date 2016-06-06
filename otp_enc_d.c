@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
-        check_identity(accept_socket); // checks that the program is of correct origin
+       // check_identity(accept_socket); // checks that the program is of correct origin
 
         /// FIRST ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
