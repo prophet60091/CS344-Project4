@@ -76,7 +76,8 @@ char *_encrypt(char *msg, char *key){
         error("Invalid Key: too small", 1);
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
-        error("Invalid Text, I will encrypt it but...only this once, and no guarantees!", 1);
+        error("Invalid Text,!", 1);
+        return 0;
     }
 
     for(i =0; i < msgLength; i++){
