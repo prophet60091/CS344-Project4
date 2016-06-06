@@ -44,7 +44,7 @@ int start_server(int port, int cc){
     //check for binding
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0) {
-        error("SERVER ERROR on binding", 1);
+        //error("SERVER ERROR on binding", 1);
         return -1;
     }
 
@@ -165,6 +165,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
 
     if(strlen(msg->key) < strlen(msg->msg) ){
         error("Key is too short for message!", 1);
+        fprintf(stdout,"Key is too short for message!");
 
     }
 
