@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
                 close(com_socket);
                 free (encrypted);
 
-                kill(pcessID, SIGKILL); // make sure the process is terminated
+                exit(0); // make sure the process is terminated
 
             default:
                 // WERE IN THE PARENT

@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include "otp_dec_d.h"
 
+
 void error(char *msg, int severity)
 {
     perror(msg);
@@ -318,7 +319,7 @@ int main(int argc, char *argv[])
                 close(com_socket);
                 free (encrypted);
 
-                kill(pcessID, SIGKILL); // make sure the process is terminated
+                exit(0); // make sure the process is terminated
 
             default:
                 // WERE IN THE PARENT
