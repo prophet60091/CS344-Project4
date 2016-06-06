@@ -140,7 +140,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, crypt *msg){
     msg->key[strlen(msg->key) -1] = '\0';
 
     if(strlen(msg->key) < strlen(msg->msg) )
-        error("Key is too small!", 9);
+        error("Key is too short for message!", 1);
 
     return result;
 }
