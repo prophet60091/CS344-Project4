@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
     }
 
     //establish the hookup channel
-    socket = start_server(atoi(argv[1]), 5);
+    socket = start_server(atoi(argv[1]), 6);
 
     if(socket < 0)
         error("no socket", 3);
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
 
         //Loop unitl we get a good port
         int i = 1;
-        while ((newSocket = start_server(newPort, 5)) < 0){
+        while ((newSocket = start_server(newPort, 1)) < 0){
 
             newPort = newPort +i; // base the new off of the last accepted FD (err socket descriptor)
             i++;
@@ -350,6 +350,7 @@ int main(int argc, char *argv[])
                 }
 
                 close(com_socket);
+                close(newSocket);
                 free (encrypted);
 
                 exit(0); // make sure the process is terminated

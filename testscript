@@ -1,0 +1,33 @@
+#!/bin/bash
+# FYI, this command removes file abc if it is empty: [ -s abc ] || rm -f abc
+
+usage="usage: $0 encryptionport decryptionport"
+
+#use the standard version of echo
+echo=/bin/echo
+
+#Make sure we have the right number of arguments
+if test $# -gt 2 -o $# -lt 2
+then
+	${echo} $usage 1>&2
+	exit 1
+fi
+
+#Clean up any previous runs
+${echo} '#Initializing - Cleaning up - ignore Operation Not Permitted errors'
+killall -q -u $USER otp_*
+rm -f ciphertext*
+rm -f plaintext*_*
+rm -f key20
+rm -f key70000
+
+#Run the daemons
+otp_enc_d $encport &
+otp_dec_d $decport &
+
+keygen 70000 > key70000
+
+otp_enc plaintext1 key70000 $encport > p1out
+otp_enc plaintext2 key70000 $encport > p2out
+otp_enc plaintext3 key70000 $encport > p3out
+
