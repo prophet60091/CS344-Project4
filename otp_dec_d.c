@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 
         /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
-        newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
+        newPort = atoi(argv[1]) + (rand() % 4000 + 100); // newport starting point
 
         //Loop unitl we get a good port
         int i = 1;

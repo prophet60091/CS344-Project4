@@ -86,7 +86,7 @@ char *_encrypt(char *msg, char *key){
         //Checks for invalid characters (only "supposed" to allow A-Z )
         if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
             fprintf(stdout, "Invalid Text!");
-            return NULL;
+
         }
 
         encMsg[i] = (char)res;
@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
         if(n == 0) { // may proceed
             /// THEN ESTABLISH A NEW COMMUNICATION PORT
             srand((unsigned) time(NULL)); // seed random
-            newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
+            newPort = atoi(argv[1]) + (rand() % 4000 + 100); // newport starting point
 
             //Loop unitl we get a good port
             int i = 1;
