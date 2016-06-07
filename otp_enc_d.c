@@ -16,7 +16,7 @@ void error(char *msg, int severity)
     perror(msg);
 
     if (severity > 1){
-        exit(2);
+        exit(1);
     }
 
 }
@@ -75,17 +75,18 @@ char *_encrypt(char *msg, char *key){
     if(strlen(key) < msgLength)
         error("Invalid Key: too small", 1);
 
-    if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
-        fprintf(stdout, "Invalid Text!");
-        return NULL;
-    }
-
     for(i =0; i < msgLength; i++){
 
         res = key[i] + msg[i]; // key ascii val + our ascii value
 
         if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
             res = res - 126 + 32;
+        }
+
+        //Checks for invalid characters (only "supposed" to allow A-Z )
+        if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
+            fprintf(stdout, "Invalid Text!");
+            return NULL;
         }
 
         encMsg[i] = (char)res;
@@ -161,7 +162,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
         error("failed reading from file", 227);
-        exit(227);
+        exit(1);
     }
 
     //pop off the newline character
@@ -251,7 +252,7 @@ int check_identity(int socket, char * incomingIdent){
     if(strcmp(pgrmIDENT, incomingIdent) != 0){
         //error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program\n");
-        return -1;
+        close(socket);
     }
  return 0;
 }
@@ -316,7 +317,9 @@ int main(int argc, char *argv[])
             //fprintf(stdout, "found a new port for ye...\n");
         };
 
-        sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
+        // gets the portnumber into a string
+        sprintf(newPortString, "%i", newPort);
+
         //send that to the client
         if( (n=write(accept_socket, newPortString, 8)) < 8){
             fprintf(stdout, "only sent %i bytes", n);
@@ -366,7 +369,7 @@ int main(int argc, char *argv[])
                 }
 
                 if(( n= process_message(fileName, keyName, &encrypted )) < 0)
-                    error("couldn't process message", 2);
+                    error("couldn't process message", 1);
 
                 sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
 

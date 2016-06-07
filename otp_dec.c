@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     //check that we have enough args
     if (argc < 3) {
         fprintf(stderr, "usage <%s> [filename] [key filename] [port number]\n", argv[0]);
-        exit(0);
+        exit(1);
     }
 
     //establish connection
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     //announce who you are, program
     n = write(x, pgrmIDENT, 3);  //send pgrm IDENT
     if (n < 0){
-        error("Sending file name failed:");
+        error("Sending ident failed:");
     }
 
     //get  new port assignment
@@ -121,6 +121,8 @@ int main(int argc, char *argv[]) {
     // error if we didnt receive the total.
     if (n < 8){
         fprintf(stdout, "Failed getting a new port: %i\n", n);
+        close(x);
+        exit(1);
     }
 
 
