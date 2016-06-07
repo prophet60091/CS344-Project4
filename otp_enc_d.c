@@ -86,7 +86,7 @@ char *_encrypt(char *msg, char *key){
         //Checks for invalid characters (only "supposed" to allow A-Z )
         if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
             fprintf(stdout, "Invalid Text!");
-
+            return 0;
         }
 
         encMsg[i] = (char)res;
