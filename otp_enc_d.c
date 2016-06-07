@@ -169,7 +169,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     msg->key[strlen(msg->key) -1] = '\0';
 
     if(strlen(msg->key) < strlen(msg->msg) ){
-        error("Key is too short for message!", 1);
+        //error("Key is too short for message!", 1);
         fprintf(stdout,"Key is too short for message!");
 
     }
@@ -249,7 +249,7 @@ void check_identity(int socket, char * incomingIdent){
     }
 
     if(strcmp(pgrmIDENT, incomingIdent) != 0){
-        error("unknown program trying to access this program", 1);
+        //error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program");
     }
 
@@ -371,7 +371,7 @@ int main(int argc, char *argv[])
 
                 if( (n=write(com_socket, eLength, 8)) < 8){
                     fprintf(stdout, "only sent %i bytes", n);
-                    error("Writing Size: Didn't send enough bytes", 1);
+                    //error("Writing Size: Didn't send enough bytes", 1);
                 }
 
                 if(eLength != 0) {  // The file must contain data
