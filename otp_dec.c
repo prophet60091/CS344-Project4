@@ -147,17 +147,19 @@ int main(int argc, char *argv[]) {
         error("Didn't receive all the bytes for msgsize");
     }
 
-    // receive the message based on the previous
-    n= receiver(x, &msgBuffer, (size_t)atoi(msgSize));
+    if(atoi(msgSize) > 0) { // message had no data
+        // receive the message based on the previous
+        n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
 
-    // error if we didnt receive the total.
-    if (n < (size_t)atoi(msgSize)){
-        fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
-        error("Didn't receive all the bytes");
+        // error if we didnt receive the total.
+        if (n < (size_t) atoi(msgSize)) {
+            fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
+            error("Didn't receive all the bytes");
+        }
+
+        //out put the info to stdout
+        fprintf(stdout, "%s", msgBuffer);
     }
-
-    //out put the info to stdout
-    fprintf(stdout, "%s", msgBuffer);
 
     //FREEDOOOOMM!!
     free(msgBuffer);

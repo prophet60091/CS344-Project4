@@ -76,7 +76,7 @@ char *_encrypt(char *msg, char *key){
         error("Invalid Key: too small", 1);
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
-        error("Invalid Text!", 1);
+        fprintf(stdout, "Invalid Text!");
         return NULL;
     }
 
