@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
         error("Didn't receive all the bytes for msgsize");
     }
 
-    if(atoi(msgSize) > 0) { // message had no data
+    if(atoi(msgSize) > 0) { // message has data
         // receive the message based on the previous
         n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
 

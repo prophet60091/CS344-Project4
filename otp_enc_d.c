@@ -72,9 +72,10 @@ char *_encrypt(char *msg, char *key){
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
-    if(strlen(key) < msgLength)
+    if(strlen(key) < msgLength){
         error("Invalid Key: too small", 1);
-
+        return NULL;
+    }
     for(i =0; i < msgLength; i++){
 
         res = key[i] + msg[i]; // key ascii val + our ascii value
@@ -272,7 +273,7 @@ int check_identity(int socket, char * incomingIdent){
     //Tell them if they may proceed by echoing the program ident:
     if ((n = write(socket, pgrmIDENT, 3)) < 3) {
         fprintf(stdout, "only sent %i bytes", n);
-        error("Sending Port: Didn't send enough bytes", 1);
+        error("Sending IDENT: Didn't send enough bytes", 1);
     }
 
  return 0;
