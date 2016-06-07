@@ -76,8 +76,7 @@ char *_encrypt(char *msg, char *key){
         error("Invalid Key: too small", 1);
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
-        error("Invalid Text,!", 1);
-        return 0;
+        error("Invalid Text!", 1);
     }
 
     for(i =0; i < msgLength; i++){
@@ -201,8 +200,6 @@ int process_message(char * fileName, char *keyName, char **result){
         error("Couldn't read message", 666);
         return -1;
     }
-
-
 
 
     //get some clean bits and store the encrypted text

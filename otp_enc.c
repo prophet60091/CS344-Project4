@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     //announce who you are, program
     n = write(x, pgrmIDENT, 3);  //send pgrm IDENT
     if (n < 0){
-        error("Sending file name failed:");
+        error("Sending Ident failed:");
     }
 
     //get  new port assignment
