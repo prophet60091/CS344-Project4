@@ -301,8 +301,7 @@ int main(int argc, char *argv[])
         memset(keyName, 0, sizeof(keyName));
 
         /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        if (!check_identity(accept_socket, incomingIdent))
-            exit(2);
+        check_identity(accept_socket, incomingIdent);
 
         /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
