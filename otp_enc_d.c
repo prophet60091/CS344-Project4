@@ -77,6 +77,7 @@ char *_encrypt(char *msg, char *key){
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
         error("Invalid Text!", 1);
+        return 0;
     }
 
     for(i =0; i < msgLength; i++){
@@ -151,7 +152,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     //gather the goods
     result = getline(&msg->msg, &s, fpFILE );
      if (result < 0){
-         error("failed reading from MSG file", 227);
+         error("failed reading from file", 227);
      }
 
     s= 0; //VIP!!! reset s to 0 for the reading the key
@@ -159,8 +160,8 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     //get the key
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
-        error("failed reading from KEY file", 227);
-        exit(1);
+        error("failed reading from file", 227);
+        exit(227);
     }
 
     //pop off the newline character
@@ -168,7 +169,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     msg->key[strlen(msg->key) -1] = '\0';
 
     if(strlen(msg->key) < strlen(msg->msg) ){
-        //error("Key is too short for message!", 1);
+        error("Key is too short for message!", 1);
         fprintf(stdout,"Key is too short for message!");
 
     }
@@ -240,40 +241,18 @@ int sender(int socket, char *msg){
 
 }
 
-//checks the identity of the incoming program
-//@params the socket on which to send
-//@params pointer where the result will be stored
-int check_identity(int socket, char * incomingIdent){
+void check_identity(int socket, char * incomingIdent){
     int n=0;
-
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
     if ((n = receiver(socket, incomingIdent, 3)) < 0){
         error("didnt receive IDENT", 2);
     }
 
-    if(strcmp(pgrmIDENT, incomingIdent) != 0) {
+    if(strcmp(pgrmIDENT, incomingIdent) != 0){
         error("unknown program trying to access this program", 1);
-        fprintf(stdout, "unknown program trying to access this program\n");
-
-        //break it off- write no
-        if ((n = write(socket, pgrmIDENT, 3)) < 3) {
-            fprintf(stdout, "only sent %i bytes", n);
-            error("Sending Port: Didn't send enough bytes", 1);
-        }
-
-        //shut things down:
-        //close the connection
-        close(socket);
-        return -1;
+        fprintf(stdout, "unknown program trying to access this program");
     }
 
-    //Tell them if they may proceed by echoing the program ident:
-    if ((n = write(socket, pgrmIDENT, 3)) < 3) {
-        fprintf(stdout, "only sent %i bytes", n);
-        error("Sending IDENT: Didn't send enough bytes", 1);
-    }
-
- return 0;
 }
 
 int main(int argc, char *argv[])
@@ -321,7 +300,7 @@ int main(int argc, char *argv[])
         memset(keyName, 0, sizeof(keyName));
 
         /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        n= check_identity(accept_socket, incomingIdent);
+        check_identity(accept_socket, incomingIdent);
 
         /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random

@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <strings.h>
-#include <string.h>
 #include "otp_enc.h"
 char * pgrmIDENT = "enc";
 
@@ -107,36 +106,9 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
             chunk = fullSize-m;
         }
 
-
     }while(m < msgBytes);
 
     return m;
-}
-
-//Authorize Function
-//@params the socket int
-// sends the identifier to the server
-//receives y if good
-//returns 0 on success!
-int authorize(int socket){
-    int n;
-    char mayProceed[3];
-    //announce who you are, program
-    n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
-    if (n < 0){
-        error("Sending ident failed:");
-    }
-
-    //Check if there is a closed connection
-    n = read(socket, mayProceed, 3);
-
-    // we received a good reply so away we go
-    if((strcmp(mayProceed, pgrmIDENT )) == 0){
-        return 0;
-    }
-    close(socket)    ;
-    return -1; // they are invalid
-
 }
 
 int main(int argc, char *argv[]) {
@@ -157,11 +129,10 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //get authorization
-    n = authorize(x);
-    if( n < 0){
-        fprintf(stdout, "Not authorized to use this system");
-        exit(2);
+    //announce who you are, program
+    n = write(x, pgrmIDENT, 3);  //send pgrm IDENT
+    if (n < 0){
+        error("Sending file name failed:");
     }
 
     //get  new port assignment
@@ -173,9 +144,11 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "Failed getting a new port: %i\n", n);
     }
 
+
     //hang up dial new connection
     close(x);
     x = make_connection(newPort);
+
 
     //Send the name of the file to be encrypted
     n = write(x, argv[1], 100);  //send file name
@@ -195,19 +168,17 @@ int main(int argc, char *argv[]) {
         error("Didn't receive all the bytes for msgsize");
     }
 
-    if(atoi(msgSize) > 0) { // message has data
-        // receive the message based on the previous
-        n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
+    // receive the message based on the previous
+    n= receiver(x, &msgBuffer, (size_t)atoi(msgSize));
 
-        // error if we didnt receive the total.
-        if (n < (size_t) atoi(msgSize)) {
-            fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
-            error("Didn't receive all the bytes");
-        }
-
-        //out put the info to stdout
-        fprintf(stdout, "%s", msgBuffer);
+    // error if we didnt receive the total.
+    if (n < (size_t)atoi(msgSize)){
+        fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
+        error("Didn't receive all the bytes");
     }
+
+    //out put the info to stdout
+    fprintf(stdout, "%s", msgBuffer);
 
     //FREEDOOOOMM!!
     free(msgBuffer);
