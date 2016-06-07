@@ -77,7 +77,7 @@ char *_encrypt(char *msg, char *key){
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
         fprintf(stdout, "Invalid Text!");
-        return '\0';
+        //return '\0';
     }
 
     for(i =0; i < msgLength; i++){
