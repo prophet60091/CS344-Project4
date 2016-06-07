@@ -66,28 +66,59 @@ int start_server(int port, int cc){
 // Encrypts the message based on the key provided
 // @ param the message to be encrpted
 // @ param the key (same format as above assumed to be at least length of msg)
+//char *_encrypt(char *msg, char *key){
+//    int i;
+//    int msgLength = (int)strlen(msg);
+//    int res;
+//    char * encMsg = calloc((size_t)msgLength, sizeof(char));
+//
+//    if(strlen(key) < msgLength){
+//        error("Invalid Key: too small", 1);
+//        return NULL;
+//    }
+//    for(i =0; i < msgLength; i++){
+//
+//        res = key[i] + msg[i]; // key ascii val + our ascii value
+//
+//        if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
+//            res = res - 126 + 32;
+//        }
+//
+//        //Checks for invalid characters (only "supposed" to allow A-Z )
+//        if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
+//            fprintf(stdout, "Invalid Text!");
+//            return NULL;
+//        }
+//
+//        encMsg[i] = (char)res;
+//    }
+//    encMsg[i]= '\n';
+//
+//    return encMsg;
+//}
+// Encrypts the message based on the key provided
+// @ param the message to be encrpted
+// @ param the key (same format as above assumed to be at least length of msg)
 char *_encrypt(char *msg, char *key){
     int i;
-    int msgLength = (int)strlen(msg);
+    int msgLength = strlen(msg);
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
-    if(strlen(key) < msgLength){
+    if(strlen(key) < msgLength)
         error("Invalid Key: too small", 1);
-        return NULL;
+
+    if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
+        error("Invalid Text!", 1);
+        return 0;
     }
+
     for(i =0; i < msgLength; i++){
 
         res = key[i] + msg[i]; // key ascii val + our ascii value
 
         if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
             res = res - 126 + 32;
-        }
-
-        //Checks for invalid characters (only "supposed" to allow A-Z )
-        if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
-            fprintf(stdout, "Invalid Text!");
-            return NULL;
         }
 
         encMsg[i] = (char)res;
@@ -154,7 +185,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     //gather the goods
     result = getline(&msg->msg, &s, fpFILE );
      if (result < 0){
-         error("failed reading from file", 227);
+         error("failed reading from MSG file", 227);
      }
 
     s= 0; //VIP!!! reset s to 0 for the reading the key
@@ -162,7 +193,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     //get the key
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
-        error("failed reading from file", 227);
+        error("failed reading from KEY file", 227);
         exit(1);
     }
 
@@ -255,7 +286,7 @@ int check_identity(int socket, char * incomingIdent){
     }
 
     if(strcmp(pgrmIDENT, incomingIdent) != 0) {
-        //error("unknown program trying to access this program", 1);
+        error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program\n");
 
         //break it off- write no
@@ -398,7 +429,7 @@ int main(int argc, char *argv[])
 
                     if ((n = write(com_socket, eLength, 8)) < 8) {
                         fprintf(stdout, "only sent %i bytes", n);
-                        //error("Writing Size: Didn't send enough bytes", 1);
+                        error("Writing Size: Didn't send enough bytes", 1);
                     }
 
                     if (strlen(encrypted) != 0) {  // The file must contain data
