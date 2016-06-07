@@ -106,6 +106,10 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
             chunk = fullSize-m;
         }
 
+        //the read failed
+        if(m < 0)
+            return m;
+
     }while(m < msgBytes);
 
     return m;
