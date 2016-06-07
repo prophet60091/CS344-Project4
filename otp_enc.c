@@ -120,7 +120,7 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
 //returns 0 on success!
 int authorize(int socket){
     int n;
-    char mayProceed[1];
+    char mayProceed[3];
     //announce who you are, program
     n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
     if (n < 0){
@@ -128,10 +128,10 @@ int authorize(int socket){
     }
 
     //Check if there is a closed connection
-    n = read(socket, mayProceed, 1);
+    n = read(socket, mayProceed, 3);
 
     // we received a good reply so away we go
-    if(strcmp(mayProceed, "y") == 0){
+    if((strcmp(mayProceed, pgrmIDENT )) == 0){
         return 0;
     }
     close(socket)    ;

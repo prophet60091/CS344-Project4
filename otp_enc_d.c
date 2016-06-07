@@ -86,7 +86,7 @@ char *_encrypt(char *msg, char *key){
         //Checks for invalid characters (only "supposed" to allow A-Z )
         if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
             fprintf(stdout, "Invalid Text!");
-            return 0;
+            return NULL;
         }
 
         encMsg[i] = (char)res;
@@ -258,7 +258,7 @@ int check_identity(int socket, char * incomingIdent){
         fprintf(stdout, "unknown program trying to access this program\n");
 
         //break it off- write no
-        if ((n = write(socket, "n", 1)) < 1) {
+        if ((n = write(socket, pgrmIDENT, 3)) < 3) {
             fprintf(stdout, "only sent %i bytes", n);
             error("Sending Port: Didn't send enough bytes", 1);
         }
@@ -269,8 +269,8 @@ int check_identity(int socket, char * incomingIdent){
         return -1;
     }
 
-    //Tell them if they may proceed:
-    if ((n = write(socket, "y", 1)) < 1) {
+    //Tell them if they may proceed by echoing the program ident:
+    if ((n = write(socket, pgrmIDENT, 3)) < 3) {
         fprintf(stdout, "only sent %i bytes", n);
         error("Sending Port: Didn't send enough bytes", 1);
     }
