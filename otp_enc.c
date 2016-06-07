@@ -157,12 +157,12 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //get authorization
-    n = authorize(x);
-    if( n < 0){
-        fprintf(stdout, "Not authorized to use this system");
-        exit(2);
-    }
+//    //get authorization
+//    n = authorize(x);
+//    if( n < 0){
+//        fprintf(stdout, "Not authorized to use this system");
+//        exit(2);
+//    }
 
     //get  new port assignment
     n =0;
