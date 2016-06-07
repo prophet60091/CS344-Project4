@@ -51,17 +51,16 @@ ${echo}
 ${echo} "#-----------------------------------------"
 ${echo} '#otp_enc plaintext1 key70000 $encport'
 ${echo} "#20 POINTS: Should return encrypted version of plaintext1"
-otp_enc plaintext1 key70000 $encport > p1OUT
-sleep 5
-otp_enc plaintext2 key70000 $encport > p2OUT
-
+otp_enc plaintext1 key70000 $encport > ciphertext1
+otp_dec ciphertext1 key70000 $encport
+otp_dec ciphertext1 key70000 $decport > ciphertext1-d
 #Clean up
 ${echo}
 ${echo} '#---------------CLEAN--------------------------'
 ${echo} '#Cleaning up - ignore Operation Not Permitted errors'
 killall -q -u $USER otp_*
-rm -f ciphertext*
-rm -f plaintext*_*
+#rm -f ciphertext*
+#rm -f plaintext*_*
 rm -f key20
 rm -f key70000
 ${echo}
