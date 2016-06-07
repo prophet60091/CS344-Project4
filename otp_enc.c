@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <strings.h>
+#include <string.h>
 #include "otp_enc.h"
 char * pgrmIDENT = "enc";
 
@@ -106,13 +107,36 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
             chunk = fullSize-m;
         }
 
-        //the read failed
-        if(m <= 0)
-            return m;
 
     }while(m < msgBytes);
 
     return m;
+}
+
+//Authorize Function
+//@params the socket int
+// sends the identifier to the server
+//receives y if good
+//returns 0 on success!
+int authorize(int socket){
+    int n;
+    char mayProceed[1];
+    //announce who you are, program
+    n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
+    if (n < 0){
+        error("Sending ident failed:");
+    }
+
+    //Check if there is a closed connection
+    n = read(socket, mayProceed, 1);
+
+    // we received a good reply so away we go
+    if(strcmp(mayProceed, "y") == 0){
+        return 0;
+    }
+    close(socket)    ;
+    return -1; // they are invalid
+
 }
 
 int main(int argc, char *argv[]) {
@@ -133,10 +157,11 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //announce who you are, program
-    n = write(x, pgrmIDENT, 3);  //send pgrm IDENT
-    if (n < 0){
-        error("Sending Ident failed:");
+    //get authorization
+    n = authorize(x);
+    if( n < 0){
+        fprintf(stdout, "Not authorized to use this system");
+        exit(2);
     }
 
     //get  new port assignment

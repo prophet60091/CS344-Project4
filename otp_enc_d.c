@@ -242,19 +242,39 @@ int sender(int socket, char *msg){
 
 }
 
+//checks the identity of the incoming program
+//@params the socket on which to send
+//@params pointer where the result will be stored
 int check_identity(int socket, char * incomingIdent){
     int n=0;
+
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
     if ((n = receiver(socket, incomingIdent, 3)) < 0){
         error("didnt receive IDENT", 2);
     }
 
-    if(strcmp(pgrmIDENT, incomingIdent) != 0){
+    if(strcmp(pgrmIDENT, incomingIdent) != 0) {
         //error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program\n");
+
+        //break it off- write no
+        if ((n = write(socket, "n", 1)) < 1) {
+            fprintf(stdout, "only sent %i bytes", n);
+            error("Sending Port: Didn't send enough bytes", 1);
+        }
+
+        //shut things down:
+        //close the connection
         close(socket);
         return -1;
     }
+
+    //Tell them if they may proceed:
+    if ((n = write(socket, "y", 1)) < 1) {
+        fprintf(stdout, "only sent %i bytes", n);
+        error("Sending Port: Didn't send enough bytes", 1);
+    }
+
  return 0;
 }
 
@@ -408,7 +428,6 @@ int main(int argc, char *argv[])
 
             }
         }
-
     }
 
     if( close(socket) < 0)
