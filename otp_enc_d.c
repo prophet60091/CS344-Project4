@@ -66,53 +66,16 @@ int start_server(int port, int cc){
 // Encrypts the message based on the key provided
 // @ param the message to be encrpted
 // @ param the key (same format as above assumed to be at least length of msg)
-//char *_encrypt(char *msg, char *key){
-//    int i;
-//    int msgLength = (int)strlen(msg);
-//    int res;
-//    char * encMsg = calloc((size_t)msgLength, sizeof(char));
-//
-//    if(strlen(key) < msgLength){
-//        error("Invalid Key: too small", 1);
-//        return NULL;
-//    }
-//    for(i =0; i < msgLength; i++){
-//
-//        res = key[i] + msg[i]; // key ascii val + our ascii value
-//
-//        if( res > 126){     //take care of all printable ascii chars (wraps when outside of range)
-//            res = res - 126 + 32;
-//        }
-//
-//        //Checks for invalid characters (only "supposed" to allow A-Z )
-//        if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
-//            fprintf(stdout, "Invalid Text!");
-//            return NULL;
-//        }
-//
-//        encMsg[i] = (char)res;
-//    }
-//    encMsg[i]= '\n';
-//
-//    return encMsg;
-//}
-// Encrypts the message based on the key provided
-// @ param the message to be encrpted
-// @ param the key (same format as above assumed to be at least length of msg)
 char *_encrypt(char *msg, char *key){
     int i;
-    int msgLength = strlen(msg);
+    int msgLength = (int)strlen(msg);
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
-    if(strlen(key) < msgLength)
+    if(strlen(key) < msgLength){
         error("Invalid Key: too small", 1);
-
-    if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
-        error("Invalid Text!", 1);
-        return 0;
+        return NULL;
     }
-
     for(i =0; i < msgLength; i++){
 
         res = key[i] + msg[i]; // key ascii val + our ascii value
@@ -121,12 +84,20 @@ char *_encrypt(char *msg, char *key){
             res = res - 126 + 32;
         }
 
+        //Checks for invalid characters (only "supposed" to allow A-Z )
+        if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
+            fprintf(stdout, "Invalid Text!");
+            return NULL;
+        }
+
         encMsg[i] = (char)res;
     }
     encMsg[i]= '\n';
 
     return encMsg;
 }
+
+
 
 // Decrypts the message based on the key provided
 // @ param the message to be decrypted
