@@ -375,7 +375,7 @@ int main(int argc, char *argv[])
                     error("Writing Size: Didn't send enough bytes", 1);
                 }
 
-                if(eLength != 0) {  // The file must contain data
+                if(strlen(encrypted) != 0) {  // The file must contain data
                     if ((n = sender(com_socket, encrypted)) < 0) {
                         error("Failed Sending", 1);
                     }
