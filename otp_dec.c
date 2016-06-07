@@ -128,7 +128,6 @@ int main(int argc, char *argv[]) {
     close(x);
     x = make_connection(newPort);
 
-
     //Send the name of the file to be encrypted
     n = write(x, argv[1], 100);  //send file name
     if (n < 0){
@@ -147,7 +146,7 @@ int main(int argc, char *argv[]) {
         error("Didn't receive all the bytes for msgsize");
     }
 
-    if(atoi(msgSize) > 0) { // message had no data
+    if(atoi(msgSize) > 0) { // message has data
         // receive the message based on the previous
         n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
 

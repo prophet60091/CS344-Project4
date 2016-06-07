@@ -68,7 +68,7 @@ int start_server(int port, int cc){
 // @ param the key (same format as above assumed to be at least length of msg)
 char *_encrypt(char *msg, char *key){
     int i;
-    int msgLength = strlen(msg);
+    int msgLength = (int)strlen(msg);
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
@@ -77,7 +77,7 @@ char *_encrypt(char *msg, char *key){
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
         fprintf(stdout, "Invalid Text!");
-        //return '\0';
+        return NULL;
     }
 
     for(i =0; i < msgLength; i++){

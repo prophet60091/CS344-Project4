@@ -144,11 +144,9 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "Failed getting a new port: %i\n", n);
     }
 
-
     //hang up dial new connection
     close(x);
     x = make_connection(newPort);
-
 
     //Send the name of the file to be encrypted
     n = write(x, argv[1], 100);  //send file name
