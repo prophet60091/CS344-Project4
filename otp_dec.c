@@ -85,7 +85,7 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
             chunk = fullSize-m;
         }
         //the read failed
-        if(m < 0)
+        if(m <= 0)
             return m;
 
     }while(m < msgBytes);
@@ -117,57 +117,59 @@ int main(int argc, char *argv[]) {
         error("Sending ident failed:");
     }
 
-    //get  new port assignment
-    n =0;
-    n= receiver(x, &newPort, 8);
-
-    // error if we didnt receive the total.
-    if (n < 8){
-        fprintf(stdout, "Failed getting a new port: %i\n", n);
-        close(x);
-        exit(1);
-    }
-
-
-    //hang up dial new connection
-    close(x);
-    x = make_connection(newPort);
-
-    //Send the name of the file to be encrypted
-    n = write(x, argv[1], 100);  //send file name
-    if (n < 0){
-        error("Sending file name failed:");
-    }
-
-    //send the name of the key file to be encrypted.
-    n= write(x, argv[2], 100); // send key file name
-    if (n < 0){
-       error("Sending key name failed:");
-    }
-
-    // Receive the size of the incoming encrypted file.
-    n= receiver(x, &msgSize, 8);
-    if (n < 8){
-        error("Didn't receive all the bytes for msgsize");
-    }
-
-    if(atoi(msgSize) > 0) { // message has data
-        // receive the message based on the previous
-        n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
+    while(x) {
+        //get  new port assignment
+        n = 0;
+        n = receiver(x, &newPort, 8);
 
         // error if we didnt receive the total.
-        if (n < (size_t) atoi(msgSize)) {
-            fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
-            error("Didn't receive all the bytes");
+        if (n < 8) {
+            fprintf(stdout, "Failed getting a new port: %i\n", n);
+            close(x);
+            exit(1);
         }
 
-        //out put the info to stdout
-        fprintf(stdout, "%s", msgBuffer);
-    }
 
-    //FREEDOOOOMM!!
-    free(msgBuffer);
-    free(msgSize);
-    close(x);
+        //hang up dial new connection
+        close(x);
+        x = make_connection(newPort);
+
+        //Send the name of the file to be encrypted
+        n = write(x, argv[1], 100);  //send file name
+        if (n < 0) {
+            error("Sending file name failed:");
+        }
+
+        //send the name of the key file to be encrypted.
+        n = write(x, argv[2], 100); // send key file name
+        if (n < 0) {
+            error("Sending key name failed:");
+        }
+
+        // Receive the size of the incoming encrypted file.
+        n = receiver(x, &msgSize, 8);
+        if (n < 8) {
+            error("Didn't receive all the bytes for msgsize");
+        }
+
+        if (atoi(msgSize) > 0) { // message has data
+            // receive the message based on the previous
+            n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
+
+            // error if we didnt receive the total.
+            if (n < (size_t) atoi(msgSize)) {
+                fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
+                error("Didn't receive all the bytes");
+            }
+
+            //out put the info to stdout
+            fprintf(stdout, "%s", msgBuffer);
+        }
+
+        //FREEDOOOOMM!!
+        free(msgBuffer);
+        free(msgSize);
+        close(x);
+    }
 
 }

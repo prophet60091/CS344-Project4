@@ -107,7 +107,7 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
         }
 
         //the read failed
-        if(m < 0)
+        if(m <= 0)
             return m;
 
     }while(m < msgBytes);
