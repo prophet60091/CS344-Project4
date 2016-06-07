@@ -241,7 +241,7 @@ int sender(int socket, char *msg){
 
 }
 
-void check_identity(int socket, char * incomingIdent){
+int check_identity(int socket, char * incomingIdent){
     int n=0;
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
     if ((n = receiver(socket, incomingIdent, 3)) < 0){
@@ -251,8 +251,9 @@ void check_identity(int socket, char * incomingIdent){
     if(strcmp(pgrmIDENT, incomingIdent) != 0){
         //error("unknown program trying to access this program", 1);
         fprintf(stdout, "unknown program trying to access this program\n");
+        return -1;
     }
-
+ return 0;
 }
 
 int main(int argc, char *argv[])
@@ -300,7 +301,8 @@ int main(int argc, char *argv[])
         memset(keyName, 0, sizeof(keyName));
 
         /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        check_identity(accept_socket, incomingIdent);
+        if (!check_identity(accept_socket, incomingIdent))
+            exit(2);
 
         /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
