@@ -77,7 +77,7 @@ char *_encrypt(char *msg, char *key){
 
     if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
         fprintf(stdout, "Invalid Text!");
-        return NULL;
+        return '\0';
     }
 
     for(i =0; i < msgLength; i++){
@@ -250,7 +250,7 @@ void check_identity(int socket, char * incomingIdent){
 
     if(strcmp(pgrmIDENT, incomingIdent) != 0){
         //error("unknown program trying to access this program", 1);
-        fprintf(stdout, "unknown program trying to access this program");
+        fprintf(stdout, "unknown program trying to access this program\n");
     }
 
 }
