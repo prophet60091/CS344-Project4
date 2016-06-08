@@ -13,6 +13,7 @@ otpdecd: otp_dec_d.h otp_enc_d.o otp_dec_d.c
 otpdec: otp_dec.h otp_dec.o otp_dec.c
 	gcc -Wall -std=c99  -o otp_dec otp_dec.c
 
+
 proj4: otpenc keygen otpencd otpdec otpdecd
 
 clean:
