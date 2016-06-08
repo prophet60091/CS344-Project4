@@ -1,0 +1,17 @@
+Robert Jackson CS344 Project4 6/7/2016
+
+Hello!
+
+This was fun but quite a struggle.
+
+To make the file simple type "make". Then the grading script can be used. I suggest using ports from 49k-50k but not higher. With the exception of the starting port, it will automatically find an open one.
+
+I had issues with the authorization. It workes on my system but hangs and thorw horrible errors on eos. I use strcmp, and that is he only odd thing in those functions. I had to shut them completetly off as the error is simply untraceable. The strcmp
+returns other than 0, even if my to variables are exact. I can't explain that.
+
+NOTE: There is one issue where it has been randomy dumping what looks like a stack trace, but I cant trace that either it's completely endemic to the eos server.
+If it does this, it goes to stdout, and when I run the grading script with > somefile, it doesnt show up there, so it's easier to read if you output to a file.
+
+
+
+
