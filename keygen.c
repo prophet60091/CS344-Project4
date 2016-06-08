@@ -33,11 +33,7 @@ char * gen_key(size_t size){
     int i;
     FILE * fp;
     char * key = malloc(sizeof(char) * size+1);
-    int keySize =0;
     int seed =0;
-    char ascii = NULL;
-
-    char * randomchar = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ "};
 
     // read from dev urandom because better random seed!
     if((int)(fp = fopen("/dev/urandom" , "r" )) < 0) { // opening fails
@@ -51,11 +47,9 @@ char * gen_key(size_t size){
 
     srand((unsigned)seed);
 
-
     //get the actual size of that key generated in case it was too short
     for(i = 0; i < size; i++){
 
-        //key[i] = randomchar[random()%28];??
         key[i] = (char)(( random()%(127 - 32)) + 32); //all printable ascii values
     }
 
