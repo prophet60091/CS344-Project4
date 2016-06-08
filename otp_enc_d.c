@@ -107,7 +107,7 @@ char *_encrypt(char *msg, char *key){
 // Decrypts the message based on the key provided
 // @ param the message to be decrypted
 // @ param the key (same format as above assumed to be at least length of msg)
-char * decrypt(char * msg, char * key){
+char * _decrypt(char * msg, char * key){
     int i;
     int msgLength = (int)strlen(msg);
     int res;
@@ -116,7 +116,6 @@ char * decrypt(char * msg, char * key){
     for(i =0; i < msgLength; i++){
 
         res = msg[i] - key[i];
-
 
         if(res < 0){
             res = res + 126 - 32;

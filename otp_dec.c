@@ -1,7 +1,6 @@
 //
 // Created by Robert on 5/30/2016.
 //
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -42,7 +41,7 @@ int make_connection(char* port){
 
     bzero((char *) &serv_addr, sizeof(serv_addr)); // clear the garbage
 
-    serv_addr.sin_family = AF_INET; //TCP
+    serv_addr.sin_family = AF_INET; //ip
 
     //assign the struct the proper values
     bcopy(server->h_addr_list[0],
@@ -136,7 +135,7 @@ int main(int argc, char *argv[]) {
         error("Connection failed on port");
 
     //Get Authorization
-    n = authorize(x);
+    n=authorize(x);
     if(n != 0){
         fprintf(stdout, "Not authorized to use this system");
         close(x);
@@ -167,7 +166,7 @@ int main(int argc, char *argv[]) {
     //send the name of the key file to be encrypted.
     n= write(x, argv[2], 100); // send key file name
     if (n < 0){
-       error("Sending key name failed:");
+        error("Sending key name failed:");
     }
 
     // Receive the size of the incoming encrypted file.
@@ -176,17 +175,17 @@ int main(int argc, char *argv[]) {
         error("Didn't receive all the bytes for msgsize");
     }
 
-    if(atoi(msgSize) > 0) { // message had no data
-        // receive the message based on the previous
-        n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
+    // receive the message based on the previous
+    n= receiver(x, &msgBuffer, (size_t)atoi(msgSize));
 
-        // error if we didnt receive the total.
-        if (n < (size_t) atoi(msgSize)) {
-            fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
-            error("Didn't receive all the bytes");
-        }
+    // error if we didnt receive the total.
+    if (n < (size_t)atoi(msgSize)){
+        fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
+        error("Didn't receive all the bytes");
+    }
 
-        //out put the info to stdout
+    //out put the info to stdout, only if the message size is greater than 1
+    if(n > 1){
         fprintf(stdout, "%s", msgBuffer);
     }
 
