@@ -117,8 +117,9 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
 //returns 0 on success!
 int authorize(int socket){
     int n;
-    char mayProceed[3];
+    char mayProceed[4];
     char * pgrmIDENT = "enc";
+    memset(mayProceed, 0, 4);
 
     //announce who you are, program
     n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT

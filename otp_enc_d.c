@@ -254,8 +254,9 @@ int sender(int socket, char *msg){
 //@params pointer where the result will be stored
 int check_identity(int socket){
     int n=-5;
-    char incomingIdent[3];
+    char incomingIdent[4];
     char * pgrmIDENT = "enc";
+    memset(incomingIdent, 0, 4);
 
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
     if ((receiver(socket, incomingIdent, 3)) < 0){
@@ -314,13 +315,13 @@ int main(int argc, char *argv[])
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
-//        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-//        n=check_identity(accept_socket);
-//
-//        if(n != 0){
-//            fprintf(stdout, "Not authorized to use this system");
-//            close(accept_socket);
-//        }else {
+        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
+        n=check_identity(accept_socket);
+
+        if(n != 0){
+            fprintf(stdout, "Not authorized to use this system");
+            close(accept_socket);
+        }else {
 
 
             /// THEN ESTABLISH A NEW COMMUNICATION PORT
@@ -422,7 +423,7 @@ int main(int argc, char *argv[])
             }
         }
 
-
+    }
 
     if( close(socket) < 0)
         error("closing main socket", 1);
