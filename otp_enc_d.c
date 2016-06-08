@@ -254,16 +254,20 @@ int sender(int socket, char *msg){
 //@params pointer where the result will be stored
 int check_identity(int socket){
     int n=-5;
-    char incomingIdent[4];
-    char * pgrmIDENT = "enc";
-    memset(incomingIdent, 0, 4);
+    char * incomingIdent = calloc(3, sizeof(char));
+    char  pgrmIDENT []= "enc";
 
-    /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-    if ((receiver(socket, incomingIdent, 4)) < 0){
-        error("didnt receive IDENT", 2);
+
+//    // FIRST CHECK WHICH PROGRAM WANTS ACCESS
+//    if ((receiver(socket, incomingIdent, 3)) < 0){
+//        error("didnt receive IDENT", 2);
+//    }
+    if ((read(socket, incomingIdent, 3)) < 3) {
+        fprintf(stdout, "only sent %i bytes", n);
+        error("Sending IDENT: Didn't send enough bytes", 1);
     }
 
-    if ((write(socket, pgrmIDENT, 4)) < 4) {
+    if ((write(socket, pgrmIDENT, 3)) < 3) {
         fprintf(stdout, "only sent %i bytes", n);
         error("Sending IDENT: Didn't send enough bytes", 1);
     }

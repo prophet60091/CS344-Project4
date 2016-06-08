@@ -307,8 +307,8 @@ int main(int argc, char *argv[])
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
-        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        //check_identity(accept_socket);
+        // FIRST CHECK WHICH PROGRAM WANTS ACCESS
+        check_identity(accept_socket);
 
         /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random
