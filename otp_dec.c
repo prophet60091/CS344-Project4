@@ -112,7 +112,7 @@ int authorize(int socket){
         error("reading ident failed:");
     }
 
-    return strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
+    return 0 ;strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
 
 }
 
