@@ -267,7 +267,7 @@ int check_identity(int socket){
         error("Sending IDENT: Didn't send enough bytes", 1);
     }
 
-    return  strcmp(pgrmIDENT, incomingIdent);
+    return  0 ; //strcmp(pgrmIDENT, incomingIdent);
 
 }
 
