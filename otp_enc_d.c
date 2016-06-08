@@ -259,11 +259,11 @@ int check_identity(int socket){
     memset(incomingIdent, 0, 4);
 
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-    if ((receiver(socket, incomingIdent, 3)) < 0){
+    if ((receiver(socket, incomingIdent, 4)) < 0){
         error("didnt receive IDENT", 2);
     }
 
-    if ((write(socket, pgrmIDENT, 3)) < 3) {
+    if ((write(socket, pgrmIDENT, 4)) < 4) {
         fprintf(stdout, "only sent %i bytes", n);
         error("Sending IDENT: Didn't send enough bytes", 1);
     }

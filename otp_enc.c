@@ -122,13 +122,13 @@ int authorize(int socket){
     memset(mayProceed, 0, 4);
 
     //announce who you are, program
-    n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
+    n = write(socket, pgrmIDENT, 34);  //send pgrm IDENT
     if (n < 0){
         error("Sending ident failed:");
     }
 
     //get reply
-    n = read(socket, mayProceed, 3);
+    n = read(socket, mayProceed, 4);
     if (n < 0){
         error("reading ident failed:");
     }
