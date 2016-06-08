@@ -67,16 +67,15 @@ int start_server(int port, int cc){
 // @ param the message to be encrpted
 // @ param the key (same format as above assumed to be at least length of msg)
 char *_encrypt(char *msg, char *key){
-    int i;
+    int i, errFlag =0;
     int msgLength = strlen(msg);
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
     if(strlen(key) < msgLength) {
         error("Invalid Key: too small", 1);
-        return NULL;
-    }
 
+    }
 
     for(i =0; i < msgLength; i++){
 
@@ -86,9 +85,14 @@ char *_encrypt(char *msg, char *key){
             res = res - 126 + 32;
         }
 
+        // if the characeters are not Alpha A-Z
         if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
+           errFlag =1;
+
+        }
+        // error display
+        if(errFlag == 1){
             error("Invalid Text!", 1);
-            return NULL;
         }
 
         encMsg[i] = (char)res;
