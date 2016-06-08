@@ -1,6 +1,7 @@
 //
 // Created by Robert on 5/30/2016.
 //
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -10,8 +11,8 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <strings.h>
+#include <string.h>
 #include "otp_dec.h"
-char * pgrmIDENT = "dec";
 
 void error(char *msg)
 {
@@ -90,6 +91,32 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
     return m;
 }
 
+//Authorize Function
+//@params the socket int
+// sends the identifier to the server
+//receives y if good
+//returns 0 on success!
+int authorize(int socket){
+    int n;
+    char mayProceed[3];
+    char * pgrmIDENT = "dec";
+
+    //announce who you are, program
+    n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
+    if (n < 0){
+        error("Sending ident failed:");
+    }
+
+    //get reply
+    n = read(socket, mayProceed, 3);
+    if (n < 0){
+        error("reading ident failed:");
+    }
+
+    return strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
+
+}
+
 int main(int argc, char *argv[]) {
     int x, n;
     char * msgBuffer = calloc(BUFSIZ, sizeof(char));
@@ -108,10 +135,12 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //announce who you are, program
-    n = write(x, pgrmIDENT, 3);  //send pgrm IDENT
-    if (n < 0){
-        error("Sending file name failed:");
+    //Get Authorization
+    n = authorize(x);
+    if(n != 0){
+        fprintf(stdout, "Not authorized to use this system");
+        close(x);
+        exit(2);
     }
 
     //get  new port assignment

@@ -12,8 +12,6 @@
 #include <strings.h>
 #include <string.h>
 #include "otp_enc.h"
-char * pgrmIDENT = "enc";
-
 
 //Sending Files
 //@params the socket int, string file contents, sizeof the message
@@ -120,21 +118,21 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
 int authorize(int socket){
     int n;
     char mayProceed[3];
+    char * pgrmIDENT = "enc";
+
     //announce who you are, program
     n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
     if (n < 0){
         error("Sending ident failed:");
     }
 
-    //Check if there is a closed connection
+    //get reply
     n = read(socket, mayProceed, 3);
-
-    // we received a good reply so away we go
-    if((strcmp(mayProceed, pgrmIDENT )) == 0){
-        return 0;
+    if (n < 0){
+        error("reading ident failed:");
     }
-    close(socket)    ;
-    return -1; // they are invalid
+
+    return strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
 
 }
 
@@ -156,10 +154,11 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //get authorization
-    n = authorize(x);
-    if( n < 0){
+    //Get Authorization
+    n=authorize(x);
+    if(n != 0){
         fprintf(stdout, "Not authorized to use this system");
+        close(x);
         exit(2);
     }
 
