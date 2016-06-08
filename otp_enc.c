@@ -204,8 +204,10 @@ int main(int argc, char *argv[]) {
         error("Didn't receive all the bytes");
     }
 
-    //out put the info to stdout
-    fprintf(stdout, "%s", msgBuffer);
+    //out put the info to stdout, only if the message size is greater than 1
+    if(n > 1){
+        fprintf(stdout, "%s", msgBuffer);
+    }
 
     //FREEDOOOOMM!!
     free(msgBuffer);

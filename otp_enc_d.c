@@ -74,7 +74,7 @@ char *_encrypt(char *msg, char *key){
 
     if(strlen(key) < msgLength) {
         error("Invalid Key: too small", 1);
-
+        return "B";
     }
 
     for(i =0; i < msgLength; i++){
@@ -93,6 +93,7 @@ char *_encrypt(char *msg, char *key){
         // error display
         if(errFlag == 1){
             error("Invalid Text!", 1);
+            return "B";
         }
 
         encMsg[i] = (char)res;
