@@ -314,13 +314,13 @@ int main(int argc, char *argv[])
         memset(fileName, 0, sizeof(fileName));
         memset(keyName, 0, sizeof(keyName));
 
-        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        n=check_identity(accept_socket);
-
-        if(n != 0){
-            fprintf(stdout, "Not authorized to use this system");
-            close(accept_socket);
-        }else {
+//        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
+//        n=check_identity(accept_socket);
+//
+//        if(n != 0){
+//            fprintf(stdout, "Not authorized to use this system");
+//            close(accept_socket);
+//        }else {
 
 
             /// THEN ESTABLISH A NEW COMMUNICATION PORT
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
             }
         }
 
-    }
+
 
     if( close(socket) < 0)
         error("closing main socket", 1);
