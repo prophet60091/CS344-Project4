@@ -13,6 +13,26 @@
 #include <string.h>
 #include "otp_enc.h"
 
+//Sending Files
+//@params the socket int, string file contents, sizeof the message
+// send the file
+//void sendfile( int sockfd, string file, unsigned long size){
+//    int m, s;
+//    unsigned long offset = 0;
+//
+//    std::cout << "TOTAL sending " << file.size() << std::endl;
+//
+//    //SEND THE WHOLE FILE
+//    while (offset < file.size()) {
+//
+//        m = send(sockfd, file.c_str()+offset, file.size()-offset,0);
+//        std::cout << "sending " << m << std::endl;
+//        if (m <= 0) break;
+//        offset += m;
+//    }// ADAPTED FROM http://stackoverflow.com/questions/15176213/read-the-whole-file-and-send-it-via-sockets
+//
+//}
+
 void error(char *msg)
 {
     perror(msg);
@@ -134,13 +154,13 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-//    //Get Authorization
-//    n=authorize(x);
-//    if(n != 0){
-//        fprintf(stdout, "Not authorized to use this system");
-//        close(x);
-//        exit(2);
-//    }
+    //Get Authorization
+    n=authorize(x);
+    if(n != 0){
+        fprintf(stdout, "Not authorized to use this system");
+        close(x);
+        exit(2);
+    }
 
     //get  new port assignment
     n =0;
