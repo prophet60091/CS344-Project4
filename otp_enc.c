@@ -132,7 +132,7 @@ int authorize(int socket){
         error("reading ident failed:");
     }
 
-    return 0; strcmp(pgrmIDENT, mayProceed); // returns other than zero if mismatched
+    return strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
 
 }
 
@@ -154,13 +154,13 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //Get Authorization
-    n=authorize(x);
-    if(n != 0){
-        fprintf(stdout, "Not authorized to use this system");
-        close(x);
-        exit(2);
-    }
+//    //Get Authorization
+//    n=authorize(x);
+//    if(n != 0){
+//        fprintf(stdout, "Not authorized to use this system");
+//        close(x);
+//        exit(2);
+//    }
 
     //get  new port assignment
     n =0;

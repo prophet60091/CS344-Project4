@@ -239,18 +239,25 @@ int sender(int socket, char *msg){
 
 }
 
-void check_identity(int socket, char * incomingIdent){
-    int n=0;
+//checks the identity of the incoming program
+//@params the socket on which to send
+//@params pointer where the result will be stored
+int check_identity(int socket){
+    int n=-5;
+    char incomingIdent[3];
+    char * pgrmIDENT = "enc";
+
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-    if ((n = receiver(socket, incomingIdent, 3)) < 0){
+    if ((receiver(socket, incomingIdent, 3)) < 0){
         error("didnt receive IDENT", 2);
     }
 
-    if(strcmp(pgrmIDENT, incomingIdent) != 0){
-        error("unknown program trying to access this program", 1);
-        fprintf(stdout, "unknown program trying to access this program");
-
+    if ((write(socket, pgrmIDENT, 3)) < 3) {
+        fprintf(stdout, "only sent %i bytes", n);
+        error("Sending IDENT: Didn't send enough bytes", 1);
     }
+
+    return  strcmp(pgrmIDENT, incomingIdent);
 
 }
 
@@ -301,7 +308,7 @@ int main(int argc, char *argv[])
         memset(keyName, 0, sizeof(keyName));
 
         /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        check_identity(accept_socket, incIDENT);
+        check_identity(accept_socket);
 
         /// THEN ESTABLISH A NEW COMMUNICATION PORT
         srand((unsigned)time(NULL)); // seed random

@@ -7,4 +7,5 @@
 
 int make_connection(char* port);
 int receiver(int sockfd, char  **msg, size_t msgBytes);
+int authorize(int socket);
 #endif //PROJECT4_OTP_ENC_H

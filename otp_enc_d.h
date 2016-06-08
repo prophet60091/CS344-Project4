@@ -18,6 +18,6 @@ char * decrypt(char * msg, char * key);
 int sender(int socket, char *msg);
 int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg);
 int process_message(char * fileName, char *keyName, char ** result);
-
+int check_identity(int socket);
 
 #endif //PROJECT4_OTP_ENC_D_H
