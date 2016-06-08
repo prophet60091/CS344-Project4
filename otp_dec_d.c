@@ -242,7 +242,6 @@ int main(int argc, char *argv[])
     char * encrypted;
     char eLength[8] ;
     char newPortString[8];
-    char incomingIdent[3];
     int  newPort;
     pid_t pcessID = -5;
     pid_t wpid = -5;
