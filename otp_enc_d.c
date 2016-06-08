@@ -73,6 +73,7 @@ char *_encrypt(char *msg, char *key){
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
     if(strlen(key) < msgLength) {
+        fprintf(stdout, "Invalid Key: too small");
         error("Invalid Key: too small", 1);
         return "B";
     }
