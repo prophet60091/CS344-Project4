@@ -98,7 +98,7 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
 int authorize(int socket){
     int n;
     char mayProceed[3];
-    char * pgrmIDENT = "dec";
+    char * pgrmIDENT = "enc";
 
     //announce who you are, program
     n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
@@ -134,13 +134,13 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-//    //Get Authorization
-//    n=authorize(x);
-//    if(n != 0){
-//        fprintf(stdout, "Not authorized to use this system");
-//        close(x);
-//        exit(2);
-//    }
+    //Get Authorization
+    n=authorize(x);
+    if(n != 0){
+        fprintf(stdout, "Not authorized to use this system");
+        close(x);
+        exit(2);
+    }
 
     //get  new port assignment
     n =0;
