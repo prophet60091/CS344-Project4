@@ -1,6 +1,7 @@
 //
 // Created by Robert on 5/30/2016.
 //
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -12,7 +13,6 @@
 #include <strings.h>
 #include <string.h>
 #include "otp_dec.h"
-char * pgrmIDENT = "dec";
 
 void error(char *msg)
 {
@@ -99,21 +99,21 @@ int receiver(int sockfd, char  **msg, size_t msgBytes){
 int authorize(int socket){
     int n;
     char mayProceed[3];
+    char * pgrmIDENT = "dec";
+
     //announce who you are, program
     n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
     if (n < 0){
         error("Sending ident failed:");
     }
 
-    //Check if there is a closed connection
+    //get reply
     n = read(socket, mayProceed, 3);
-
-    // we received a good reply so away we go
-    if((strcmp(mayProceed, pgrmIDENT )) == 0){
-        return 0;
+    if (n < 0){
+        error("reading ident failed:");
     }
-    close(socket)    ;
-    return -1; // they are invalid
+
+    return strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
 
 }
 
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     //check that we have enough args
     if (argc < 3) {
         fprintf(stderr, "usage <%s> [filename] [key filename] [port number]\n", argv[0]);
-        exit(1);
+        exit(0);
     }
 
     //establish connection
@@ -135,21 +135,21 @@ int main(int argc, char *argv[]) {
     if (x < 0)
         error("Connection failed on port");
 
-    //get authorization
+    //Get Authorization
     n = authorize(x);
-    if( n < 0){
+    if(n != 0){
         fprintf(stdout, "Not authorized to use this system");
+        close(x);
         exit(2);
     }
+
     //get  new port assignment
-    n = 0;
-    n = receiver(x, &newPort, 8);
+    n =0;
+    n= receiver(x, &newPort, 8);
 
     // error if we didnt receive the total.
-    if (n < 8) {
+    if (n < 8){
         fprintf(stdout, "Failed getting a new port: %i\n", n);
-        close(x);
-        exit(1);
     }
 
 
@@ -157,25 +157,26 @@ int main(int argc, char *argv[]) {
     close(x);
     x = make_connection(newPort);
 
+
     //Send the name of the file to be encrypted
     n = write(x, argv[1], 100);  //send file name
-    if (n < 0) {
+    if (n < 0){
         error("Sending file name failed:");
     }
 
     //send the name of the key file to be encrypted.
-    n = write(x, argv[2], 100); // send key file name
-    if (n < 0) {
-        error("Sending key name failed:");
+    n= write(x, argv[2], 100); // send key file name
+    if (n < 0){
+       error("Sending key name failed:");
     }
 
     // Receive the size of the incoming encrypted file.
-    n = receiver(x, &msgSize, 8);
-    if (n < 8) {
+    n= receiver(x, &msgSize, 8);
+    if (n < 8){
         error("Didn't receive all the bytes for msgsize");
     }
 
-    if (atoi(msgSize) > 0) { // message has data
+    if(atoi(msgSize) > 0) { // message had no data
         // receive the message based on the previous
         n = receiver(x, &msgBuffer, (size_t) atoi(msgSize));
 
@@ -193,6 +194,5 @@ int main(int argc, char *argv[]) {
     free(msgBuffer);
     free(msgSize);
     close(x);
-
 
 }

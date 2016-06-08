@@ -9,14 +9,14 @@
 #include <string.h>
 #include <sys/wait.h>
 #include "otp_enc_d.h"
-char * pgrmIDENT = "enc";
+
 
 void error(char *msg, int severity)
 {
     perror(msg);
 
     if (severity > 1){
-        exit(1);
+        exit(2);
     }
 
 }
@@ -67,15 +67,16 @@ int start_server(int port, int cc){
 // @ param the message to be encrpted
 // @ param the key (same format as above assumed to be at least length of msg)
 char *_encrypt(char *msg, char *key){
-    int i;
-    int msgLength = (int)strlen(msg);
+    int i, errFlag =0;
+    int msgLength = strlen(msg);
     int res;
     char * encMsg = calloc((size_t)msgLength, sizeof(char));
 
-    if(strlen(key) < msgLength){
+    if(strlen(key) < msgLength) {
         error("Invalid Key: too small", 1);
-        return NULL;
+        return "B";
     }
+
     for(i =0; i < msgLength; i++){
 
         res = key[i] + msg[i]; // key ascii val + our ascii value
@@ -84,10 +85,15 @@ char *_encrypt(char *msg, char *key){
             res = res - 126 + 32;
         }
 
-        //Checks for invalid characters (only "supposed" to allow A-Z )
-        if((msg[i] > 90 || msg[i] < 65) && msg[i] != 32 ){
-            fprintf(stdout, "Invalid Text!");
-            return NULL;
+        // if the characeters are not Alpha A-Z
+        if((msg[0] > 90 || msg[0] < 65) && msg[0] != 32 ){
+           errFlag =1;
+
+        }
+        // error display
+        if(errFlag == 1){
+            error("Invalid Text!", 1);
+            return "B";
         }
 
         encMsg[i] = (char)res;
@@ -96,8 +102,6 @@ char *_encrypt(char *msg, char *key){
 
     return encMsg;
 }
-
-
 
 // Decrypts the message based on the key provided
 // @ param the message to be decrypted
@@ -165,7 +169,7 @@ int _read_message(FILE *fpFILE, FILE *fpKEY, cryptog *msg){
     result = getline(&msg->key, &s, fpKEY );
     if (result < 0){
         error("failed reading from KEY file", 227);
-        exit(1);
+        exit(227);
     }
 
     //pop off the newline character
@@ -248,37 +252,23 @@ int sender(int socket, char *msg){
 //checks the identity of the incoming program
 //@params the socket on which to send
 //@params pointer where the result will be stored
-int check_identity(int socket, char * incomingIdent){
-    int n=0;
+int check_identity(int socket){
+    int n=-5;
+    char incomingIdent[3];
+    char * pgrmIDENT = "enc";
 
     /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-    if ((n = receiver(socket, incomingIdent, 3)) < 0){
+    if ((receiver(socket, incomingIdent, 3)) < 0){
         error("didnt receive IDENT", 2);
     }
 
-    if(strcmp(pgrmIDENT, incomingIdent) != 0) {
-        error("unknown program trying to access this program", 1);
-        fprintf(stdout, "unknown program trying to access this program\n");
-
-        //break it off- write no
-        if ((n = write(socket, pgrmIDENT, 3)) < 3) {
-            fprintf(stdout, "only sent %i bytes", n);
-            error("Sending Port: Didn't send enough bytes", 1);
-        }
-
-        //shut things down:
-        //close the connection
-        close(socket);
-        return -1;
-    }
-
-    //Tell them if they may proceed by echoing the program ident:
-    if ((n = write(socket, pgrmIDENT, 3)) < 3) {
+    if ((write(socket, pgrmIDENT, 3)) < 3) {
         fprintf(stdout, "only sent %i bytes", n);
         error("Sending IDENT: Didn't send enough bytes", 1);
     }
 
- return 0;
+    return  strcmp(pgrmIDENT, incomingIdent);
+
 }
 
 int main(int argc, char *argv[])
@@ -326,12 +316,17 @@ int main(int argc, char *argv[])
         memset(keyName, 0, sizeof(keyName));
 
         /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
-        n= check_identity(accept_socket, incomingIdent);
+        n=check_identity(accept_socket);
 
-        if(n == 0) { // may proceed
+        if(n != 0){
+            fprintf(stdout, "Not authorized to use this system");
+            close(accept_socket);
+        }else {
+
+
             /// THEN ESTABLISH A NEW COMMUNICATION PORT
             srand((unsigned) time(NULL)); // seed random
-            newPort = atoi(argv[1]) + (rand() % 4000 + 100); // newport starting point
+            newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
 
             //Loop unitl we get a good port
             int i = 1;
