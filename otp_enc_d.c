@@ -299,138 +299,138 @@ int main(int argc, char *argv[])
 
 //    //establish the hookup channel
     socket = start_server(atoi(argv[1]), 6);
-//
-//    if(socket < 0)
-//        error("no socket", 3);
-//
-//    //loop to accept incoming connections;
+
+    if(socket < 0)
+        error("no socket", 3);
+
+    //loop to accept incoming connections;
     while ((accept_socket = accept(socket, (struct sockaddr *) &cli_addr, &clilen)) >=0){
-//
+
         if (accept_socket < 0) {
             error("SERVER ERROR on Accept", 3);
         }else{
 
             fprintf(stdout, "client connected...\n");
         }
-//
-//        //add this to the
-//        //make sure all garbage is out
-//        memset(eLength, 0, sizeof(eLength));
-//        memset(fileName, 0, sizeof(fileName));
-//        memset(keyName, 0, sizeof(keyName));
-//
+
+        //add this to the
+        //make sure all garbage is out
+        memset(eLength, 0, sizeof(eLength));
+        memset(fileName, 0, sizeof(fileName));
+        memset(keyName, 0, sizeof(keyName));
+
 //        /// FIRST CHECK WHICH PROGRAM WANTS ACCESS
         n=check_identity(accept_socket);
-//
+
         if(n != 0){
             fprintf(stdout, "Not authorized to use this system");
             close(accept_socket);
         }else {
 //
-          fprintf(stdout, "Gestattet");
-//            /// THEN ESTABLISH A NEW COMMUNICATION PORT
-//            srand((unsigned) time(NULL)); // seed random
-//            newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
-//
-//            //Loop unitl we get a good port
-//            int i = 1;
-//            while ((newSocket = start_server(newPort, 1)) < 0) {
-//
-//                newPort = newPort + i; // base the new off of the last accepted FD (err socket descriptor)
-//                i++;
-//                //fprintf(stdout, "found a new port for ye...\n");
-//            };
-//
-//            sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
-//            //send that to the client
-//            if ((n = write(accept_socket, newPortString, 8)) < 8) {
-//                fprintf(stdout, "only sent %i bytes", n);
-//                error("Sending Port: Didn't send enough bytes", 1);
-//            } else {
-//                //fprintf(stdout, "told the clint to find me on port %i", newPort);
-//            }
-//
-//            if (close(accept_socket) < 0)
-//                error("closing accept socket", 1);
-//
-//            //FORK!!
-//            pcessID = fork();
-//            //printf("spawning processes..%i\n", pcessID);
-//            //partially adapted from lecture 9 cs344
-//            switch ((int) pcessID) {
-//
-//                case -1:
-//                    //it's in a bad state
-//
-//                    error("boom!", 5050505);
-//                    exit(1);
-//
-//
-//                case 0:// WE'RE IN THE CHILD PROCESS
-//
-//                    com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
-//
-//                    if (com_socket < 0) {
-//                        error("SERVER ERROR on Accept", 3);
-//                    } else {
-//
-//                        //fprintf(stdout, "client connected on this shiny new socket!...\n");
-//                    }
-//
-//                    //immediately close the listening socket we don't want anyone else on it!
-//                    if (close(newSocket) < 0)
-//                        error("closing newSocket", 1);
-//
-//                    //NOW PROCESS MESSAGES LIKE
-//                    if ((n = receiver(com_socket, fileName, 100)) < 0) {
-//                        error("didnt receive file name", 2);
-//                    }
-//
-//                    if ((n = receiver(com_socket, keyName, 100)) < 0) {
-//                        error("didnt receive key file name", 2);
-//                    }
-//
-//                    if ((n = process_message(fileName, keyName, &encrypted)) < 0)
-//                        error("couldn't process message", 2);
-//
-//                    sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
-//
-//                    if ((n = write(com_socket, eLength, 8)) < 8) {
-//                        fprintf(stdout, "only sent %i bytes", n);
-//                        error("Writing Size: Didn't send enough bytes", 1);
-//                    }
-//
-//                    if ((n = sender(com_socket, encrypted)) < 0) {
-//                        error("Failed Sending", 1);
-//                    }
-//
-//                    if (close(com_socket) < 0)
-//                        error("closing com socket", 1);
-//
-//                    free(encrypted);
-//
-//                    exit(0); // make sure the process is terminated
-//
-//                default:
-//                    // WERE IN THE PARENT
-//                    //ADAPTED FROM **http://brennan.io/2015/01/16/write-a-shell-in-c/**//
-//                    //Too elegant to pass up. it works really well
-//                    //  were storing the result of waitpid using WUNTRACED, (reports its status whether stopped or not)
-//                    // as long as the process didn't exit, or receive a signal, so it's waiting util that happens
-//                    // when it does, we know that the child process is complete.
-//                    do {
-//                        wpid = waitpid(pcessID, &status, WUNTRACED);
-//
-//                    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-//
-//
+            fprintf(stdout, "Gestattet");
+            /// THEN ESTABLISH A NEW COMMUNICATION PORT
+            srand((unsigned) time(NULL)); // seed random
+            newPort = atoi(argv[1]) + (rand() % 6000 + 1000); // newport starting point
+
+            //Loop unitl we get a good port
+            int i = 1;
+            while ((newSocket = start_server(newPort, 1)) < 0) {
+
+                newPort = newPort + i; // base the new off of the last accepted FD (err socket descriptor)
+                i++;
+                //fprintf(stdout, "found a new port for ye...\n");
+            };
+
+            sprintf(newPortString, "%i", newPort); // gets the portnumber into a string
+            //send that to the client
+            if ((n = write(accept_socket, newPortString, 8)) < 8) {
+                fprintf(stdout, "only sent %i bytes", n);
+                error("Sending Port: Didn't send enough bytes", 1);
+            } else {
+                //fprintf(stdout, "told the clint to find me on port %i", newPort);
+            }
+
+            if (close(accept_socket) < 0)
+                error("closing accept socket", 1);
+
+            //FORK!!
+            pcessID = fork();
+            //printf("spawning processes..%i\n", pcessID);
+            //partially adapted from lecture 9 cs344
+            switch ((int) pcessID) {
+
+                case -1:
+                    //it's in a bad state
+
+                    error("boom!", 5050505);
+                    exit(1);
+
+
+                case 0:// WE'RE IN THE CHILD PROCESS
+
+                    com_socket = accept(newSocket, (struct sockaddr *) &cli_addr, &clilen);
+
+                    if (com_socket < 0) {
+                        error("SERVER ERROR on Accept", 3);
+                    } else {
+
+                        //fprintf(stdout, "client connected on this shiny new socket!...\n");
+                    }
+
+                    //immediately close the listening socket we don't want anyone else on it!
+                    if (close(newSocket) < 0)
+                        error("closing newSocket", 1);
+
+                    //NOW PROCESS MESSAGES LIKE
+                    if ((n = receiver(com_socket, fileName, 100)) < 0) {
+                        error("didnt receive file name", 2);
+                    }
+
+                    if ((n = receiver(com_socket, keyName, 100)) < 0) {
+                        error("didnt receive key file name", 2);
+                    }
+
+                    if ((n = process_message(fileName, keyName, &encrypted)) < 0)
+                        error("couldn't process message", 2);
+
+                    sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
+
+                    if ((n = write(com_socket, eLength, 8)) < 8) {
+                        fprintf(stdout, "only sent %i bytes", n);
+                        error("Writing Size: Didn't send enough bytes", 1);
+                    }
+
+                    if ((n = sender(com_socket, encrypted)) < 0) {
+                        error("Failed Sending", 1);
+                    }
+
+                    if (close(com_socket) < 0)
+                        error("closing com socket", 1);
+
+                    free(encrypted);
+
+                    exit(0); // make sure the process is terminated
+
+                default:
+                    // WERE IN THE PARENT
+                    //ADAPTED FROM **http://brennan.io/2015/01/16/write-a-shell-in-c/**//
+                    //Too elegant to pass up. it works really well
+                    //  were storing the result of waitpid using WUNTRACED, (reports its status whether stopped or not)
+                    // as long as the process didn't exit, or receive a signal, so it's waiting util that happens
+                    // when it does, we know that the child process is complete.
+                    do {
+                        wpid = waitpid(pcessID, &status, WUNTRACED);
+
+                    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+
+
             }
         }
-//
-//    }
 
-//    if( close(socket) < 0)
-//        error("closing main socket", 1);
-//
-//    exit (0);
+    }
+
+    if( close(socket) < 0)
+        error("closing main socket", 1);
+
+    exit (0);
 }

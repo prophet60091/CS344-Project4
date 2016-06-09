@@ -162,58 +162,60 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "Not authorized to use this system");
         close(x);
         exit(2);
+    }else{
+        fprintf(stdout, "Gestattet");
     }
 
-//    //get  new port assignment
-//    n =0;
-//    n= receiver(x, &newPort, 8);
-//
-//    // error if we didnt receive the total.
-//    if (n < 8){
-//        fprintf(stdout, "Failed getting a new port: %i\n", n);
-//    }
-//
-//
-//    //hang up dial new connection
-//    close(x);
-//    x = make_connection(newPort);
-//
-//
-//    //Send the name of the file to be encrypted
-//    n = write(x, argv[1], 100);  //send file name
-//    if (n < 0){
-//        error("Sending file name failed:");
-//    }
-//
-//    //send the name of the key file to be encrypted.
-//    n= write(x, argv[2], 100); // send key file name
-//    if (n < 0){
-//       error("Sending key name failed:");
-//    }
-//
-//    // Receive the size of the incoming encrypted file.
-//    n= receiver(x, &msgSize, 8);
-//    if (n < 8){
-//        error("Didn't receive all the bytes for msgsize");
-//    }
-//
-//    // receive the message based on the previous
-//    n= receiver(x, &msgBuffer, (size_t)atoi(msgSize));
-//
-//    // error if we didnt receive the total.
-//    if (n < (size_t)atoi(msgSize)){
-//        fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
-//        error("Didn't receive all the bytes");
-//    }
-//
-//    //out put the info to stdout, only if the message size is greater than 1
-//    if(n > 1){
-//        fprintf(stdout, "%s", msgBuffer);
-//    }
-//
-//    //FREEDOOOOMM!!
-//    free(msgBuffer);
-//    free(msgSize);
-//    close(x);
+    //get  new port assignment
+    n =0;
+    n= receiver(x, &newPort, 8);
+
+    // error if we didnt receive the total.
+    if (n < 8){
+        fprintf(stdout, "Failed getting a new port: %i\n", n);
+    }
+
+
+    //hang up dial new connection
+    close(x);
+    x = make_connection(newPort);
+
+
+    //Send the name of the file to be encrypted
+    n = write(x, argv[1], 100);  //send file name
+    if (n < 0){
+        error("Sending file name failed:");
+    }
+
+    //send the name of the key file to be encrypted.
+    n= write(x, argv[2], 100); // send key file name
+    if (n < 0){
+       error("Sending key name failed:");
+    }
+
+    // Receive the size of the incoming encrypted file.
+    n= receiver(x, &msgSize, 8);
+    if (n < 8){
+        error("Didn't receive all the bytes for msgsize");
+    }
+
+    // receive the message based on the previous
+    n= receiver(x, &msgBuffer, (size_t)atoi(msgSize));
+
+    // error if we didnt receive the total.
+    if (n < (size_t)atoi(msgSize)){
+        fprintf(stdout, "Didn't receive all the bytes in the message: %i\n", n);
+        error("Didn't receive all the bytes");
+    }
+
+    //out put the info to stdout, only if the message size is greater than 1
+    if(n > 1){
+        fprintf(stdout, "%s", msgBuffer);
+    }
+
+    //FREEDOOOOMM!!
+    free(msgBuffer);
+    free(msgSize);
+    close(x);
 
 }
