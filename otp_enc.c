@@ -133,7 +133,7 @@ int authorize(int socket){
     if (n < 0){
         error("reading ident failed:");
     }
-    fprintf(stdout, "OTP ENC comparing - %s, with  %s \n", mayProceed, pgrmIDENT);
+    fprintf(stdout, "OTP ENC comparing - \"%s\", with \"%s\"\n", mayProceed, pgrmIDENT);
     return strcmp(mayProceed, pgrmIDENT); // returns other than zero if mismatched
 
 }
