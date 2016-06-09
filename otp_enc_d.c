@@ -389,9 +389,9 @@ int main(int argc, char *argv[])
                     if ((n = receiver(com_socket, keyName, 100)) < 0) {
                         error("didnt receive key file name", 2);
                     }
-                    fprintf(stdout, "Got some  more bytes: %i\n", n);
-                    if ((n = process_message(fileName, keyName, &encrypted)) < 0)
-                        error("couldn't process message", 2);
+//                    fprintf(stdout, "Got some  more bytes: %i\n", n);
+//                    if ((n = process_message(fileName, keyName, &encrypted)) < 0)
+//                        error("couldn't process message", 2);
 
                     fprintf(stdout, "Here is what I know: %s - %s", keyName, fileName);
 
