@@ -271,7 +271,7 @@ int check_identity(int socket){
         fprintf(stdout, "only sent %i bytes", n);
         error("Sending IDENT: Didn't send enough bytes", 1);
     }
-    printf(stdout, "OTP ENC D comparing - %s, with  %s \n", incomingIdent, pgrmIDENT);
+    fprintf(stdout, "OTP ENC D comparing - %s, with  %s \n", incomingIdent, pgrmIDENT);
     return  strcmp(pgrmIDENT, incomingIdent);
 
 }
