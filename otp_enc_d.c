@@ -264,7 +264,7 @@ int check_identity(int socket){
 //    }
     if ((read(socket, incomingIdent, 4)) < 4) {
         fprintf(stdout, "only sent %i bytes", n);
-        error("Sending IDENT: Didn't send enough bytes", 1);
+        error("reading IDENT: Didn't send enough bytes", 1);
     }
 
     if ((write(socket, pgrmIDENT, 4)) < 4) {
@@ -434,3 +434,4 @@ int main(int argc, char *argv[])
 
     exit (0);
 }
+
