@@ -123,7 +123,7 @@ int authorize(int socket){
 
 
     //announce who you are, program
-    n = write(socket, pgrmIDENT, 3);  //send pgrm IDENT
+    n = write(socket, pgrmIDENT, 4);  //send pgrm IDENT
     if (n < 0){
         error("Sending ident failed:");
     }
