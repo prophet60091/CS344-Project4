@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
     if (n < 8){
         error("Didn't receive all the bytes for msgsize");
     }
-
+    fprintf(stdout, "got msg size of: %i\n - %s", n, msgSize);
     // receive the message based on the previous
     n= receiver(x, &msgBuffer, (size_t)atoi(msgSize));
 

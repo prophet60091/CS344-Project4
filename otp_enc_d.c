@@ -399,11 +399,12 @@ int main(int argc, char *argv[])
                         fprintf(stdout, "only sent %i bytes", n);
                         error("Writing Size: Didn't send enough bytes", 1);
                     }
+                    fprintf(stdout, "told em what to epxect: %i - %s", n, eLength);
 
                     if ((n = sender(com_socket, encrypted)) < 0) {
                         error("Failed Sending", 1);
                     }
-
+                    fprintf(stdout, "sent the encrypted: %i - %s \n-----------------------\n", n, encrypted);
                     if (close(com_socket) < 0)
                         error("closing com socket", 1);
 
