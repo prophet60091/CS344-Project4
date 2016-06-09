@@ -393,13 +393,15 @@ int main(int argc, char *argv[])
                     if ((n = process_message(fileName, keyName, &encrypted)) < 0)
                         error("couldn't process message", 2);
 
+                    fprintf(stdout, "Here is what I know: %s - %s", keyName, fileName);
+
                     sprintf(eLength, "%zu", strlen(encrypted)); // gets the length of the encrypted txt into a string
 
                     if ((n = write(com_socket, eLength, 8)) < 8) {
                         fprintf(stdout, "only sent %i bytes", n);
                         error("Writing Size: Didn't send enough bytes", 1);
                     }
-                    fprintf(stdout, "told em what to epxect: %i - %s", n, eLength);
+                    fprintf(stdout, "told em what to expect: %i - %s", n, eLength);
 
                     if ((n = sender(com_socket, encrypted)) < 0) {
                         error("Failed Sending", 1);
