@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
         close(x);
         exit(2);
     }else{
-        fprintf(stdout, "Gestattet");
+        fprintf(stdout, "OK");
     }
 
     //get  new port assignment
@@ -178,6 +178,7 @@ int main(int argc, char *argv[]) {
 
     //hang up dial new connection
     close(x);
+    fprintf(stdout, "connecting to a new port: %s\n", newPort);
     x = make_connection(newPort);
 
 
