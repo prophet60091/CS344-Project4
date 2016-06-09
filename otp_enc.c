@@ -187,13 +187,13 @@ int main(int argc, char *argv[]) {
     if (n < 0){
         error("Sending file name failed:");
     }
-
+    fprintf(stdout, "wrote some bytes: %i\n", n);
     //send the name of the key file to be encrypted.
     n= write(x, argv[2], 100); // send key file name
     if (n < 0){
        error("Sending key name failed:");
     }
-
+    fprintf(stdout, "wrote some more bytes: %i\n", n);
     // Receive the size of the incoming encrypted file.
     n= receiver(x, &msgSize, 8);
     if (n < 8){
